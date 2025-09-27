@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} AUDIENCE_RESONANCE_AGENT_CONFIG
+ * @description Configuration for the EmpathyMatrix AI agent.
+ * This advanced resonance analyst uses collective psychology models with advanced emotion
+ * processing techniques to analyze and predict the audience's emotional and intellectual response.
+ * It is equipped with extensive demographic databases and social learning algorithms to understand
+ * complex audience interactions.
+ */
+export const AUDIENCE_RESONANCE_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.AUDIENCE_RESONANCE,
     name: "EmpathyMatrix AI",
     description: "وكيل مصفوفة التعاطف الجماهيري: محلل صدى متطور يستخدم نماذج علم النفس الجماعي مع تقنيات معالجة المشاعر المتقدمة لتحليل وتنبؤ استجابة الجمهور العاطفية والفكرية، مزود بقواعد بيانات ديموغرافية واسعة وخوارزميات التعلم الاجتماعي لفهم التفاعل الجماهيري المعقد.",
     category: TaskCategory.PREDICTIVE,
@@ -12,7 +22,7 @@ import type { AIAgentConfig } from '../types/types';
       selfReflection: false,
       ragEnabled: true,
       vectorSearch: false,
-      agentOrchestration: false,
+      agentOrstration: false,
       metacognitive: false,
       adaptiveLearning: true,
       complexityScore: 0.80,

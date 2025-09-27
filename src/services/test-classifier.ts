@@ -1,7 +1,10 @@
 // Test script to verify our classifier improvements
 // Test script to verify our classifier improvements
 
-// Mock the ScreenplayClassifier class with our improved logic
+/**
+ * @class ScreenplayClassifier
+ * @description A mock of the ScreenplayClassifier class with improved logic for testing.
+ */
 class ScreenplayClassifier {
   // Constants
   static readonly AR_AB_LETTER = '\u0600-\u06FF';

@@ -1,7 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
-    name: "SynthesisOrchestrator AI", 
+/**
+ * @const {AIAgentConfig} INTEGRATED_AGENT_CONFIG
+ * @description Configuration for the SynthesisOrchestrator AI agent.
+ * This advanced orchestral agent uses swarm intelligence techniques to coordinate and integrate
+ * analysis and creative processes into a unified workflow. It is equipped with multi-level
+ * reinforcement learning algorithms and adaptive complexity control capabilities based on context.
+ */
+export const INTEGRATED_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.INTEGRATED,
+    name: "SynthesisOrchestrator AI",
     description: "المنسق التركيبي الذكي: وكيل أوركسترالي متقدم يستخدم تقنيات الذكاء الجمعي (Swarm Intelligence) لتنسيق وتكامل عمليات التحليل والإبداع في تدفق عمل موحد، مزود بخوارزميات التعلم التعزيزي متعدد المستويات وقدرات التحكم التكيفي في شدة التعقيد حسب السياق.",
     category: TaskCategory.CORE,
     capabilities: {

@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} CONFLICT_DYNAMICS_AGENT_CONFIG
+ * @description Configuration for the TensionField AI agent.
+ * This advanced dynamic analyst applies fluid mechanics theories to conflict dynamics,
+ * using complex mathematical models to simulate the evolution of tension and conflict.
+ * It is equipped with Monte Carlo simulation algorithms and predictive analysis techniques
+ * to foresee points of explosion and escalation in the dramatic structure.
+ */
+export const CONFLICT_DYNAMICS_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.CONFLICT_DYNAMICS,
     name: "TensionField AI",
     description: "وكيل حقول التوتر الدرامي: محلل ديناميكي متطور يطبق نظريات ميكانيكا الموائع على ديناميكيات الصراع، مستخدماً نماذج رياضية معقدة لمحاكاة تطور التوترات والصراعات، مزود بخوارزميات المحاكاة المونت كارلو وتقنيات التحليل التنبؤي لاستشراف نقاط الانفجار والتصعيد في البنية الدرامية.",
     category: TaskCategory.ANALYSIS,

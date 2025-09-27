@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} DIALOGUE_FORENSICS_AGENT_CONFIG
+ * @description Configuration for the Voiceprint AI agent.
+ * This advanced linguistic analyzer uses advanced NLP techniques with specialized BERT models
+ * to analyze the unique vocal characteristics of each character. It is equipped with algorithms
+ * for contextual sentiment analysis, fine-grained linguistic pattern recognition, and detection
+ * of stylistic inconsistencies.
+ */
+export const DIALOGUE_FORENSICS_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.DIALOGUE_FORENSICS,
     name: "Voiceprint AI",
     description: "وكيل البصمة الصوتية للحوار: محلل لغوي متطور يستخدم تقنيات معالجة اللغة الطبيعية المتقدمة مع نماذج BERT المتخصصة لتحليل الخصائص الصوتية الفريدة لكل شخصية، مزود بخوارزميات تحليل المشاعر السياقية ونماذج التعرف على الأنماط اللغوية الدقيقة وكشف التناقضات الأسلوبية.",
     category: TaskCategory.ANALYSIS,

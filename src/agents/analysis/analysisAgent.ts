@@ -1,6 +1,15 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} ANALYSIS_AGENT_CONFIG
+ * @description Configuration for the CritiqueArchitect AI, a core analysis agent.
+ * This agent performs a deep, multi-dimensional critical analysis of dramatic texts.
+ * It uses a hybrid multi-agent system, integrating dialectical thinking with deep vector analysis
+ * to uncover hidden structures and complex patterns in screenplays.
+ */
+export const ANALYSIS_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.ANALYSIS,
     name: "CritiqueArchitect AI",
     description: "وكيل التحليل النقدي المعماري: نظام هجين متعدد الوكلاء يدمج التفكير الجدلي مع التحليل الشعاعي العميق، مزود بذاكرة طويلة المدى وقدرات التفكير الذاتي لكشف البنى المخفية والأنماط المعقدة في النصوص الدرامية.",
     category: TaskCategory.CORE,
