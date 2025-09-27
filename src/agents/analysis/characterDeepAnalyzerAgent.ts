@@ -1,6 +1,15 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} CHARACTER_DEEP_ANALYZER_AGENT_CONFIG
+ * @description Configuration for the PsycheScope AI agent.
+ * This advanced character analyzer uses computational psychology models and intelligent psychoanalysis
+ * techniques to delve into the depths of characters, analyzing their unconscious motivations.
+ * It is equipped with algorithms for detecting complex psychological patterns and dynamic character development models.
+ */
+export const CHARACTER_DEEP_ANALYZER_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.CHARACTER_DEEP_ANALYZER,
     name: "PsycheScope AI",
     description: "الوحدة 3 - مجهر النفسية العميقة: محلل شخصيات متقدم يستخدم نماذج علم النفس الحاسوبي مع تقنيات التحليل النفسي الذكي لسبر أغوار الشخصيات وتحليل دوافعها اللاواعية، مزود بخوارزميات كشف الأنماط النفسية المعقدة ونماذج التطور الشخصي الديناميكي، مع قدرات تقييم العمق النفسي والتماسك الشخصي.",
     category: TaskCategory.ADVANCED_MODULES,

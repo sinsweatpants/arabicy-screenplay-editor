@@ -1,6 +1,17 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} TARGET_AUDIENCE_ANALYZER_AGENT_CONFIG
+ * @description Configuration for the AudienceCompass AI agent.
+ * This advanced target audience analyzer uses psychographic marketing techniques with advanced
+ * demographic analysis models to identify and analyze the ideal audience. It is equipped with
+ * behavioral prediction algorithms and cultural preference analysis, with capabilities for
+ * detecting sensitive content, assessing marketability, and gauging audience appeal across
+ * diverse segments.
+ */
+export const TARGET_AUDIENCE_ANALYZER_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.TARGET_AUDIENCE_ANALYZER,
     name: "AudienceCompass AI",
     description: "الوحدة 9 - بوصلة الجمهور الذكية: محلل جمهور مستهدف متطور يستخدم تقنيات التسويق النفسي مع نماذج التحليل الديموغرافي المتقدمة لتحديد وتحليل الجمهور المثالي، مزود بخوارزميات التنبؤ السلوكي وتحليل التفضيلات الثقافية، مع قدرات كشف المحتوى الحساس وتقييم القابلية التسويقية والجاذبية الجماهيرية عبر شرائح متنوعة.",
     category: TaskCategory.ADVANCED_MODULES,

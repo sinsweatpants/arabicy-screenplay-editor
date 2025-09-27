@@ -1,48 +1,85 @@
-
-
-// Fix: Removed ResponseMimeType from import as it's not exported by @google/genai
-import { GoogleGenAI, GenerateContentResponse, Part, Content, SafetySetting, HarmCategory, HarmBlockThreshold } from "@google/genai";
-// Fix: Import ENHANCED_TASK_DESCRIPTIONS from '../constants'
-import { TaskCategory, TaskType } from '../types/types'; 
-import { 
-  GEMINI_TEXT_MODEL, 
+import { GoogleGenerativeAI, GenerateContentResponse, Part, Content, SafetySetting, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { TaskCategory, TaskType } from '../../types/types';
+import {
+  GEMINI_TEXT_MODEL,
   PROMPT_PERSONA_BASE,
   TASK_SPECIFIC_INSTRUCTIONS,
   TASKS_EXPECTING_JSON_RESPONSE,
-  COMPLETION_ENHANCEMENT_OPTIONS, 
+  COMPLETION_ENHANCEMENT_OPTIONS,
   TASK_CATEGORY_MAP
-} from '../constants';
-import { ENHANCED_TASK_DESCRIPTIONS as TASK_DESCRIPTIONS_FOR_PROMPT } from '../ai/orchestration';
+} from '../../constants';
+import { ENHANCED_TASK_DESCRIPTIONS as TASK_DESCRIPTIONS_FOR_PROMPT } from '../instructions/prompts';
+import { ProcessedFile } from './fileReaderService';
 
-
+/**
+ * @interface ProcessTextsParams
+ * @description Defines the parameters for the `processTextsWithGemini` function.
+ * @property {ProcessedFile[]} processedFiles - An array of files that have been processed for API submission.
+ * @property {TaskType} taskType - The type of task to be performed by the Gemini model.
+ * @property {string} specialRequirements - Any special user-defined requirements for the task.
+ * @property {string} additionalInfo - Additional information provided by the user.
+ * @property {string} [completionScope] - The specific scope for a completion task.
+ * @property {TaskType[]} [selectedCompletionEnhancements] - An array of selected enhancements for a completion task.
+ * @property {string} [previousContextText] - The text from a previous completion, for iterative tasks.
+ */
 interface ProcessTextsParams {
   processedFiles: ProcessedFile[];
   taskType: TaskType;
   specialRequirements: string;
   additionalInfo: string;
-  completionScope?: string; 
+  completionScope?: string;
   selectedCompletionEnhancements?: TaskType[];
-  previousContextText?: string; // For iterative completion
+  previousContextText?: string;
 }
 
-let ai: GoogleGenAI | null = null;
+/**
+ * @interface GeminiTaskResultData
+ * @description A flexible type to represent the data returned from a Gemini task, which could be a structured object or a raw string.
+ */
+export type GeminiTaskResultData = { [key: string]: any } | string;
 
-const getAiInstance = (): GoogleGenAI => {
+/**
+ * @interface GeminiServiceResponse
+ * @description Represents the response from the Gemini service, containing either data or an error.
+ * @property {GeminiTaskResultData} [data] - The data returned by the Gemini API.
+ * @property {string} [rawText] - The raw text response from the API.
+ * @property {string} [error] - An error message if the request failed.
+ */
+export interface GeminiServiceResponse {
+  data?: GeminiTaskResultData;
+  rawText?: string;
+  error?: string;
+}
+
+let ai: GoogleGenerativeAI | null = null;
+
+/**
+ * @function getAiInstance
+ * @description Initializes and returns a singleton instance of the GoogleGenerativeAI client.
+ * @throws {Error} If the API_KEY environment variable is not set.
+ * @returns {GoogleGenerativeAI} The singleton instance of the GoogleGenerativeAI client.
+ */
+const getAiInstance = (): GoogleGenerativeAI => {
   if (!ai) {
     if (!process.env.API_KEY) {
       throw new Error("لم يتم تعيين متغير البيئة API_KEY.");
     }
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    ai = new GoogleGenerativeAI(process.env.API_KEY);
   }
   return ai;
 };
 
+/**
+ * @function attemptToFixJson
+ * @description Attempts to fix a broken JSON string by extracting the content between the first '{' and last '}' or '[' and last ']'.
+ * @param {string} jsonString - The potentially broken JSON string.
+ * @returns {string} The fixed JSON string or the original string if it cannot be fixed.
+ */
 const attemptToFixJson = (jsonString: string): string => {
-    // Try to extract content between the first '{' and last '}' or first '[' and last ']'
     const objectMatch = jsonString.match(/\{(?:.|\n)*\}/s);
     if (objectMatch && objectMatch[0]) {
         try {
-            JSON.parse(objectMatch[0]); 
+            JSON.parse(objectMatch[0]);
             return objectMatch[0];
         } catch (e) {
             // console.warn("attemptToFixJson: Extracted object substring is not valid JSON.", e);
@@ -57,20 +94,24 @@ const attemptToFixJson = (jsonString: string): string => {
             // console.warn("attemptToFixJson: Extracted array substring is not valid JSON.", e);
         }
     }
-    // If no clear object/array found, or if parsing failed, return original string for further debugging
-    return jsonString; 
+    return jsonString;
 };
 
-
+/**
+ * @function constructPromptParts
+ * @description Constructs the array of prompt parts to be sent to the Gemini API based on the task parameters.
+ * @param {ProcessTextsParams} params - The parameters for the task.
+ * @returns {Part[]} An array of `Part` objects to be sent to the API.
+ */
 const constructPromptParts = (params: ProcessTextsParams): Part[] => {
-  const { 
-    processedFiles, 
-    taskType, 
-    specialRequirements, 
-    additionalInfo, 
+  const {
+    processedFiles,
+    taskType,
+    specialRequirements,
+    additionalInfo,
     completionScope,
     selectedCompletionEnhancements,
-    previousContextText 
+    previousContextText
   } = params;
   const parts: Part[] = [];
 
@@ -78,7 +119,6 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
   const taskDescription = TASK_DESCRIPTIONS_FOR_PROMPT[taskType] || "مهمة عامة";
   const category = TASK_CATEGORY_MAP[taskType];
   const taskLabel = taskDescription.split(':')[0].trim();
-
 
   switch(category) {
     case TaskCategory.CORE:
@@ -88,7 +128,7 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
         taskSpecificRole = `بصفتك خبير تحليل درامي ونقدي، متخصص في "${taskLabel}".`;
       }
       break;
-    case TaskCategory.ANALYSIS: 
+    case TaskCategory.ANALYSIS:
         taskSpecificRole = `بصفتك خبير تحليل درامي متخصص في "${taskLabel}".`;
       break;
     case TaskCategory.CREATIVE:
@@ -98,7 +138,6 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
       taskSpecificRole = `بصفتك مستشرف وخبير استراتيجي في تطوير الدراما متخصص في "${taskLabel}".`;
       break;
     case TaskCategory.ADVANCED_MODULES:
-      // Extract the core name of the module for a more focused role. E.g., "مُحلل الشخصيات العميق"
       const moduleNameOnly = TASK_DESCRIPTIONS_FOR_PROMPT[taskType] ? TASK_DESCRIPTIONS_FOR_PROMPT[taskType].substring(TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf(':') + 1, TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf('-') !==-1 ? TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf('-') : TASK_DESCRIPTIONS_FOR_PROMPT[taskType].length).trim() : taskLabel;
       taskSpecificRole = `بصفتك خبير متخصص في "${moduleNameOnly}", قادر على إجراء تحليلات معمقة وتقديم نتائج منظمة بناءً على المكونات المحددة للوحدة.`;
       break;
@@ -112,7 +151,7 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
       }
       break;
   }
-  
+
   parts.push({ text: PROMPT_PERSONA_BASE.replace('CritiqueConstruct AI', `CritiqueConstruct AI. ${taskSpecificRole}`) });
 
   const taskInstructions = TASK_SPECIFIC_INSTRUCTIONS[taskType];
@@ -130,10 +169,10 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
     parts.push({ text: "\n--- نهاية السياق السابق ---\n" });
     parts.push({ text: "يرجى الآن معالجة الملفات الحالية (إذا كانت منفصلة عن السياق أعلاه) والاستمرار في الاستكمال." });
   }
-  
+
   processedFiles.forEach((file, index) => {
     parts.push({ text: `\n\n--- الملف المقدم ${index + 1}: ${file.name} (نوع MIME: ${file.mimeType}) ---` });
-    
+
     if (file.mimeType.startsWith('image/') || file.mimeType === 'application/pdf') {
       if (file.isBase64 && file.content && !file.content.startsWith('[Error:') && !file.content.startsWith('[ملاحظة:')) {
         parts.push({ inlineData: { mimeType: file.mimeType, data: file.content } });
@@ -141,7 +180,7 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
             parts.push({text: "[ملاحظة: تم إرسال ملف PDF كبيانات. قد يتمكن النموذج من معالجة المحتوى إذا كان PDF يحتوي على طبقة نصية أو إذا كان النموذج يدعم OCR على ملفات PDF المرسلة بهذه الطريقة. إذا كان المحتوى النصي للـ PDF هو الأساس، يفضل تحويله إلى .txt أو .docx.]"});
         }
       } else if (file.content.startsWith('[Error:') || file.content.startsWith('[ملاحظة:')) {
-        parts.push({ text: file.content }); 
+        parts.push({ text: file.content });
       } else {
          parts.push({ text: `[الملف ${file.name} (${file.mimeType}) كان من المتوقع أن يكون base64 ولكن لم تتم معالجته بشكل صحيح أو أن محتواه فارغ.]`});
       }
@@ -151,20 +190,20 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
       } else {
         parts.push({ text: file.content });
       }
-    } else if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') { 
-      if (file.content.startsWith('[Error:') || file.content.startsWith('[ملاحظة:')) { 
-        parts.push({ text: file.content }); 
-      } else { 
+    } else if (file.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      if (file.content.startsWith('[Error:') || file.content.startsWith('[ملاحظة:')) {
+        parts.push({ text: file.content });
+      } else {
         parts.push({ text: `محتوى من ملف DOCX (${file.name}):\n${file.content}` });
       }
-    } else if (file.mimeType === 'application/msword') { 
+    } else if (file.mimeType === 'application/msword') {
       parts.push({ text: file.content });
-    } else { 
-      parts.push({ text: file.content }); 
+    } else {
+      parts.push({ text: file.content });
     }
     parts.push({ text: `--- نهاية الملف ${index + 1}: ${file.name} ---` });
   });
-  
+
   let userRequirementsSection = "\n\n## مواصفات المستخدم الإضافية:\n";
   let hasUserSpecs = false;
   if (specialRequirements) {
@@ -185,7 +224,7 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
     selectedCompletionEnhancements.forEach(enhancementId => {
       const enhancementDetail = COMPLETION_ENHANCEMENT_OPTIONS.find(opt => opt.id === enhancementId);
       const enhancementInstructions = TASK_SPECIFIC_INSTRUCTIONS[enhancementId] || `تطبيق مبادئ ${enhancementDetail?.label || enhancementId}.`;
-      
+
       let goalSummary = enhancementDetail?.label || enhancementId;
       const goalMatch = enhancementInstructions.match(/\*\*الهدف:\*\*\s*([^\r\n]+)/);
       if (goalMatch && goalMatch[1]) {
@@ -202,48 +241,54 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
     userRequirementsSection += `لم يتم تقديم متطلبات محددة أو نطاق استكمال أو تحسينات من المستخدم بخلاف الملفات ونوع المهمة.\n`;
   }
   parts.push({ text: userRequirementsSection });
-  
+
   const jsonReminderTasks = TASKS_EXPECTING_JSON_RESPONSE.map(t => TASK_DESCRIPTIONS_FOR_PROMPT[t]?.split(':')[0] || t).join(', ');
   parts.push({ text: `\n\n**تذكير بتعليمات الإخراج الصارمة**: اللغة العربية الفصحى. إذا كانت المهمة تتطلب إخراج JSON (مثل مهام: ${jsonReminderTasks}), يجب أن يكون ردك الأساسي هو كائن JSON صالح يتبع الواجهة المحددة للمهمة، وقد يكون محاطًا بـ \`\`\`json ... \`\`\`.` });
-  
+
   return parts;
 };
 
+const MAX_RETRIES = 1;
 
-const MAX_RETRIES = 1; 
-
+/**
+ * @function processTextsWithGemini
+ * @description Processes texts and files with the Gemini API, handling prompt construction, API calls, response parsing, and error handling.
+ * @param {ProcessTextsParams} params - The parameters for the Gemini API call.
+ * @param {number} [retries=0] - The current number of retries for the API call.
+ * @returns {Promise<GeminiServiceResponse>} A promise that resolves with the response from the Gemini service.
+ */
 export const processTextsWithGemini = async (params: ProcessTextsParams, retries: number = 0): Promise<GeminiServiceResponse> => {
   try {
     const genAI = getAiInstance();
+    const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
     const promptParts = constructPromptParts(params);
 
     const contents: Content[] = [{ role: "user", parts: promptParts }];
 
     const shouldExpectJson = TASKS_EXPECTING_JSON_RESPONSE.includes(params.taskType);
 
-    // Base model config
-    const modelConfig: any = { 
-      temperature: 0.7, 
-      topK: 40,         
-      topP: 0.95,       
-      maxOutputTokens: 8192, 
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-      ] as SafetySetting[]
-    };
-    
-    const response: GenerateContentResponse = await genAI.models.generateContent({
-      model: GEMINI_TEXT_MODEL,
-      contents: contents,
-      config: modelConfig, 
-    });
-    
-    const rawTextOutput = response.text;
+    const safetySettings: SafetySetting[] = [
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
+    ];
 
-    if (!rawTextOutput) { 
+    const result = await model.generateContent({
+      contents,
+      safetySettings,
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+      }
+    });
+
+    const response: GenerateContentResponse = result.response;
+    const rawTextOutput = response.text();
+
+    if (!rawTextOutput) {
         if (response.candidates && response.candidates[0] && response.candidates[0].finishReason !== "STOP") {
              return { error: ` أنهى Gemini المعالجة بسبب: ${response.candidates[0].finishReason}. قد يكون المحتوى قد تم حظره أو انتهى بشكل غير متوقع.` };
         }
@@ -253,71 +298,62 @@ export const processTextsWithGemini = async (params: ProcessTextsParams, retries
     let jsonStr = rawTextOutput.trim();
     const fenceRegex = /^(?:\s*```(?:json)?\s*\n?)?([\s\S]*?)(?:\n?\s*```\s*)?$/s;
     const match = jsonStr.match(fenceRegex);
-    if (match && match[1]) { 
+    if (match && match[1]) {
       jsonStr = match[1].trim();
     }
 
-    // Only attempt to parse if it looks like a JSON object or array
     if (jsonStr.startsWith('{') || jsonStr.startsWith('[')) {
       try {
         const parsedData: GeminiTaskResultData = JSON.parse(jsonStr);
         return { data: parsedData, rawText: rawTextOutput };
       } catch (e) {
-        // First parse failed, try to fix it.
         const fixedJsonStr = attemptToFixJson(jsonStr);
         try {
             const parsedData: GeminiTaskResultData = JSON.parse(fixedJsonStr);
             return { data: parsedData, rawText: rawTextOutput };
         } catch (e2) {
             console.error("فشل في تحليل JSON حتى بعد محاولة الإصلاح:", e2, "\nالنص الأصلي:", rawTextOutput, "\nالنص الذي تمت محاولة إصلاحه:", fixedJsonStr);
-            // If it was *supposed* to be JSON, show the user the specific error.
             if (shouldExpectJson) {
                 return { data: rawTextOutput, rawText: rawTextOutput, error: "تم استلام نص غير متوقع بدلاً من JSON. يتم عرض النص الخام." };
             }
-            // Otherwise, for creative tasks, just fall back to raw text without an error.
             return { data: rawTextOutput, rawText: rawTextOutput };
         }
       }
     }
-    
-    // If it doesn't look like JSON, treat it as raw text.
-    // If we were expecting JSON but got something else entirely, flag it.
+
     if (shouldExpectJson) {
         return { data: rawTextOutput, rawText: rawTextOutput, error: "تم استلام نص غير متوقع بدلاً من JSON. يتم عرض النص الخام." };
     }
 
-    // Otherwise, it's a valid text response for a creative task.
     return { data: rawTextOutput, rawText: rawTextOutput };
 
   } catch (e: any) {
     console.error(`خطأ في معالجة النصوص مع Gemini (محاولة ${retries}/${MAX_RETRIES}):`, e);
-    
+
     if (retries < MAX_RETRIES && (e.status >= 500 || (e.message && e.message.toLowerCase().includes("network error")) ) ) {
       console.log(`إعادة المحاولة (${retries + 1}/${MAX_RETRIES})...`);
-      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retries))); 
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retries)));
       return processTextsWithGemini(params, retries + 1);
     }
 
     let errorMessage = e.message || "حدث خطأ غير معروف مع Gemini API.";
-    if (e.toString && e.toString().toLowerCase().includes("api_key")) { 
+    if (e.toString && e.toString().toLowerCase().includes("api_key")) {
         errorMessage = "مفتاح Gemini API مفقود أو غير صالح. يرجى التأكد من تكوين متغير البيئة API_KEY بشكل صحيح.";
-    } else if (e.message && e.message.toLowerCase().includes("request entity size is larger than limit")) { 
+    } else if (e.message && e.message.toLowerCase().includes("request entity size is larger than limit")) {
       errorMessage = "حجم الملفات المرسلة أو حجم السياق الكلي يتجاوز الحد المسموح به من Gemini API. يرجى محاولة تقليل حجم الملفات أو عددها، أو تقصير نطاق الاستكمال إذا كنت تستخدم الاستكمال التكراري.";
-    } else if (e.message && (e.message.toLowerCase().includes("unsupported mime type") || e.message.toLowerCase().includes("invalid_argument"))) { 
+    } else if (e.message && (e.message.toLowerCase().includes("unsupported mime type") || e.message.toLowerCase().includes("invalid_argument"))) {
       errorMessage = "واجهت Gemini API مشكلة في معالجة أحد أنواع الملفات المرفوعة أو محتواها. يرجى التحقق من أن الملفات هي من الأنواع المدعومة (نصوص، صور، PDF، DOCX بعد المعالجة) وأنها غير تالفة.";
-    } else if (e.status && (e.status === 400 || e.status === 'INVALID_ARGUMENT')) { 
+    } else if (e.status && (e.status === 400 || e.status === 'INVALID_ARGUMENT')) {
         errorMessage = `خطأ في الطلب إلى Gemini API (قد يكون بسبب محتوى غير متوقع أو تنسيق خاطئ): ${e.message || 'وسيطات غير صالحة.'}`;
     } else if (e.status >= 500) {
         errorMessage = `واجه خادم Gemini API مشكلة (خطأ ${e.status}). يرجى المحاولة مرة أخرى لاحقًا. ${e.message || ''}`;
     }
-    
-    // More detailed error from Gemini response if available
+
     if (e.response && e.response.error && e.response.error.message) {
         errorMessage = `خطأ من Gemini API: ${e.response.error.message}`;
-    } else if (e.message && e.message.includes("content") && e.message.includes("blocked")) { // Check for content blocking
+    } else if (e.message && e.message.includes("content") && e.message.includes("blocked")) {
         errorMessage = `تم حظر المحتوى بواسطة Gemini API بسبب سياسات الأمان. ${e.message}`;
     }
-
 
     return { error: errorMessage };
   }

@@ -19,12 +19,22 @@ import AdvancedAgentsPopup from './AdvancedAgentsPopup';
 // ==================== PRODUCTION-READY SYSTEM CLASSES ====================
 
 /**
- * نظام إدارة الحالة العام
+ * @class StateManager
+ * @description Manages the state of the application.
+ * @property {Map<string, any>} state - The state of the application.
+ * @property {Map<string, Array<(value: any) => void>>} subscribers - The subscribers to the state changes.
  */
 class StateManager {
   private state = new Map();
   private subscribers = new Map();
 
+  /**
+   * @method subscribe
+   * @description Subscribes to a state change.
+   * @param {string} key - The key to subscribe to.
+   * @param {(value: any) => void} callback - The callback to execute when the state changes.
+   * @returns {() => void} - A function to unsubscribe.
+   */
   subscribe(key: string, callback: (value: any) => void) {
     if (!this.subscribers.has(key)) {
       this.subscribers.set(key, []);
@@ -42,19 +52,37 @@ class StateManager {
     };
   }
 
+  /**
+   * @method setState
+   * @description Sets the state for a given key.
+   * @param {string} key - The key to set.
+   * @param {any} value - The value to set.
+   */
   setState(key: string, value: any) {
     this.state.set(key, value);
     const callbacks = this.subscribers.get(key) || [];
     callbacks.forEach((callback: any) => callback(value));
   }
 
+  /**
+   * @method getState
+   * @description Gets the state for a given key.
+   * @param {string} key - The key to get.
+   * @returns {any} - The value of the state.
+   */
   getState(key: string) {
     return this.state.get(key);
   }
 }
 
 /**
- * نظام الحفظ التلقائي والنسخ الاحتياطية
+ * @class AutoSaveManager
+ * @description Manages auto-saving and backups.
+ * @property {number | null} autoSaveInterval - The interval for auto-saving.
+ * @property {string} currentContent - The current content of the editor.
+ * @property {string} lastSaved - The last saved content.
+ * @property {((content: string) => Promise<void>) | null} saveCallback - The callback to execute when saving.
+ * @property {number} intervalMs - The interval in milliseconds for auto-saving.
  */
 class AutoSaveManager {
   private autoSaveInterval: number | null = null;
@@ -64,18 +92,36 @@ class AutoSaveManager {
 
   private intervalMs: number;
 
+  /**
+   * @constructor
+   * @param {number} intervalMs - The interval in milliseconds for auto-saving.
+   */
   constructor(intervalMs: number = 30000) {
     this.intervalMs = intervalMs;
   }
 
+  /**
+   * @method setSaveCallback
+   * @description Sets the save callback.
+   * @param {(content: string) => Promise<void>} callback - The callback to execute when saving.
+   */
   setSaveCallback(callback: (content: string) => Promise<void>) {
     this.saveCallback = callback;
   }
 
+  /**
+   * @method updateContent
+   * @description Updates the current content.
+   * @param {string} content - The new content.
+   */
   updateContent(content: string) {
     this.currentContent = content;
   }
 
+  /**
+   * @method startAutoSave
+   * @description Starts the auto-save interval.
+   */
   startAutoSave() {
     if (this.autoSaveInterval) return;
 
@@ -92,6 +138,10 @@ class AutoSaveManager {
     }, this.intervalMs);
   }
 
+  /**
+   * @method stopAutoSave
+   * @description Stops the auto-save interval.
+   */
   stopAutoSave() {
     if (this.autoSaveInterval) {
       clearInterval(this.autoSaveInterval);
@@ -99,6 +149,10 @@ class AutoSaveManager {
     }
   }
 
+  /**
+   * @method forceSave
+   * @description Forces a save.
+   */
   async forceSave() {
     if (this.saveCallback) {
       await this.saveCallback(this.currentContent);
@@ -108,9 +162,18 @@ class AutoSaveManager {
 }
 
 /**
- * محرك البحث والاستبدال المتقدم
+ * @class AdvancedSearchEngine
+ * @description Provides advanced search and replace functionality.
  */
 class AdvancedSearchEngine {
+  /**
+   * @method searchInContent
+   * @description Searches for a query in the content.
+   * @param {string} content - The content to search in.
+   * @param {string} query - The query to search for.
+   * @param {any} options - The search options.
+   * @returns {Promise<any>} - The search results.
+   */
   async searchInContent(content: string, query: string, options: any = {}) {
     const results: Array<{ lineNumber: number; content: string; matches: Array<{ text: string; index: number; length: number }> }> = [];
     const lines = content.split('\n');
@@ -166,6 +229,15 @@ class AdvancedSearchEngine {
     }
   }
 
+  /**
+   * @method replaceInContent
+   * @description Replaces a search query with a new text in the content.
+   * @param {string} content - The content to search in.
+   * @param {string} searchQuery - The query to search for.
+   * @param {string} replaceText - The text to replace with.
+   * @param {any} options - The replace options.
+   * @returns {Promise<any>} - The replace results.
+   */
   async replaceInContent(content: string, searchQuery: string, replaceText: string, options: any = {}) {
     const caseSensitive = options.caseSensitive || false;
     const wholeWords = options.wholeWords || false;
@@ -215,54 +287,107 @@ class AdvancedSearchEngine {
 }
 
 /**
- * نظام التعاون والتعليقات
+ * @class CollaborationSystem
+ * @description Manages collaboration and comments.
+ * @property {Array<{ id: string; name: string; color: string }>} collaborators - The list of collaborators.
+ * @property {Array<{ id: string; content: string; author: string; timestamp: Date; position: any }>} comments - The list of comments.
+ * @property {Array<(data: any) => void>} changeCallbacks - The list of callbacks to execute on change.
  */
 class CollaborationSystem {
   private collaborators: Array<{ id: string; name: string; color: string }> = [];
   private comments: Array<{ id: string; content: string; author: string; timestamp: Date; position: any }> = [];
   private changeCallbacks: Array<(data: any) => void> = [];
 
+  /**
+   * @method addCollaborator
+   * @description Adds a collaborator.
+   * @param {{ id: string; name: string; color: string }} collaborator - The collaborator to add.
+   */
   addCollaborator(collaborator: { id: string; name: string; color: string }) {
     this.collaborators.push(collaborator);
     this.notifyChanges({ type: 'collaborator_added', collaborator });
   }
 
+  /**
+   * @method removeCollaborator
+   * @description Removes a collaborator.
+   * @param {string} id - The ID of the collaborator to remove.
+   */
   removeCollaborator(id: string) {
     this.collaborators = this.collaborators.filter(c => c.id !== id);
     this.notifyChanges({ type: 'collaborator_removed', id });
   }
 
+  /**
+   * @method addComment
+   * @description Adds a comment.
+   * @param {{ id: string; content: string; author: string; timestamp: Date; position: any }} comment - The comment to add.
+   */
   addComment(comment: { id: string; content: string; author: string; timestamp: Date; position: any }) {
     this.comments.push(comment);
     this.notifyChanges({ type: 'comment_added', comment });
   }
 
+  /**
+   * @method removeComment
+   * @description Removes a comment.
+   * @param {string} id - The ID of the comment to remove.
+   */
   removeComment(id: string) {
     this.comments = this.comments.filter(c => c.id !== id);
     this.notifyChanges({ type: 'comment_removed', id });
   }
 
+  /**
+   * @method subscribeToChanges
+   * @description Subscribes to changes.
+   * @param {(data: any) => void} callback - The callback to execute on change.
+   */
   subscribeToChanges(callback: (data: any) => void) {
     this.changeCallbacks.push(callback);
   }
 
+  /**
+   * @method notifyChanges
+   * @description Notifies subscribers of changes.
+   * @param {any} data - The data to send to subscribers.
+   */
   private notifyChanges(data: any) {
     this.changeCallbacks.forEach(callback => callback(data));
   }
 
+  /**
+   * @method getCollaborators
+   * @description Gets the list of collaborators.
+   * @returns {Array<{ id: string; name: string; color: string }>} - The list of collaborators.
+   */
   getCollaborators() {
     return [...this.collaborators];
   }
 
+  /**
+   * @method getComments
+   * @description Gets the list of comments.
+   * @returns {Array<{ id: string; content: string; author: string; timestamp: Date; position: any }>} - The list of comments.
+   */
   getComments() {
     return [...this.comments];
   }
 }
 
 /**
- * مساعد الكتابة بالذكاء الاصطناعي
+ * @class AIWritingAssistant
+ * @description Provides AI-powered writing assistance.
  */
 class AIWritingAssistant {
+  /**
+   * @method generateText
+   * @description Generates text based on a prompt and context.
+   * @param {string} prompt - The prompt to generate text from.
+   * @param {string} context - The context for the generation.
+   * @param {any} options - The generation options.
+   * @returns {Promise<any>} - The generated text and suggestions.
+   */
   async generateText(prompt: string, context: string, options: any = {}) {
     // In a real implementation, this would call an AI service
     // For now, we'll simulate the response
@@ -281,6 +406,14 @@ class AIWritingAssistant {
     });
   }
 
+  /**
+   * @method rewriteText
+   * @description Rewrites text in a specific style.
+   * @param {string} text - The text to rewrite.
+   * @param {string} style - The style to apply.
+   * @param {any} options - The rewrite options.
+   * @returns {Promise<any>} - The rewritten text and changes.
+   */
   async rewriteText(text: string, style: string, options: any = {}) {
     // In a real implementation, this would call an AI service
     return new Promise((resolve) => {
@@ -300,12 +433,21 @@ class AIWritingAssistant {
 }
 
 /**
- * نظام إدارة المشاريع والقوالب
+ * @class ProjectManager
+ * @description Manages projects and templates.
+ * @property {Array<{ id: string; name: string; createdAt: Date; lastModified: Date }>} projects - The list of projects.
+ * @property {Array<{ id: string; name: string; content: string }>} templates - The list of templates.
  */
 class ProjectManager {
   private projects: Array<{ id: string; name: string; createdAt: Date; lastModified: Date }> = [];
   private templates: Array<{ id: string; name: string; content: string }> = [];
 
+  /**
+   * @method createProject
+   * @description Creates a new project.
+   * @param {string} name - The name of the project.
+   * @returns {{ id: string; name: string; createdAt: Date; lastModified: Date }} - The new project.
+   */
   createProject(name: string) {
     const project = {
       id: Math.random().toString(36).substr(2, 9),
@@ -317,14 +459,32 @@ class ProjectManager {
     return project;
   }
 
+  /**
+   * @method getProjects
+   * @description Gets the list of projects.
+   * @returns {Array<{ id: string; name: string; createdAt: Date; lastModified: Date }>} - The list of projects.
+   */
   getProjects() {
     return [...this.projects];
   }
 
+  /**
+   * @method getProject
+   * @description Gets a project by its ID.
+   * @param {string} id - The ID of the project.
+   * @returns {{ id: string; name: string; createdAt: Date; lastModified: Date } | undefined} - The project.
+   */
   getProject(id: string) {
     return this.projects.find(p => p.id === id);
   }
 
+  /**
+   * @method updateProject
+   * @description Updates a project.
+   * @param {string} id - The ID of the project to update.
+   * @param {any} updates - The updates to apply.
+   * @returns {{ id: string; name: string; createdAt: Date; lastModified: Date } | null} - The updated project.
+   */
   updateProject(id: string, updates: any) {
     const project = this.projects.find(p => p.id === id);
     if (project) {
@@ -334,10 +494,22 @@ class ProjectManager {
     return null;
   }
 
+  /**
+   * @method deleteProject
+   * @description Deletes a project.
+   * @param {string} id - The ID of the project to delete.
+   */
   deleteProject(id: string) {
     this.projects = this.projects.filter(p => p.id !== id);
   }
 
+  /**
+   * @method addTemplate
+   * @description Adds a new template.
+   * @param {string} name - The name of the template.
+   * @param {string} content - The content of the template.
+   * @returns {{ id: string; name: string; content: string }} - The new template.
+   */
   addTemplate(name: string, content: string) {
     const template = {
       id: Math.random().toString(36).substr(2, 9),
@@ -348,10 +520,21 @@ class ProjectManager {
     return template;
   }
 
+  /**
+   * @method getTemplates
+   * @description Gets the list of templates.
+   * @returns {Array<{ id: string; name: string; content: string }>} - The list of templates.
+   */
   getTemplates() {
     return [...this.templates];
   }
 
+  /**
+   * @method applyTemplate
+   * @description Applies a template.
+   * @param {string} templateId - The ID of the template to apply.
+   * @returns {string | null} - The content of the template.
+   */
   applyTemplate(templateId: string) {
     const template = this.templates.find(t => t.id === templateId);
     return template ? template.content : null;
@@ -359,12 +542,23 @@ class ProjectManager {
 }
 
 /**
- * نظام التخطيط البصري (المخططات الزمنية، القصص المصورة)
+ * @class VisualPlanningSystem
+ * @description Manages visual planning tools like storyboards and beat sheets.
+ * @property {Array<{ id: string; sceneId: string; description: string; imageUrl?: string }>} storyboards - The list of storyboards.
+ * @property {Array<{ id: string; act: number; beat: string; description: string }>} beatSheets - The list of beat sheets.
  */
 class VisualPlanningSystem {
   private storyboards: Array<{ id: string; sceneId: string; description: string; imageUrl?: string }> = [];
   private beatSheets: Array<{ id: string; act: number; beat: string; description: string }> = [];
 
+  /**
+   * @method addStoryboard
+   * @description Adds a new storyboard.
+   * @param {string} sceneId - The ID of the scene.
+   * @param {string} description - The description of the storyboard.
+   * @param {string} [imageUrl] - The URL of the image for the storyboard.
+   * @returns {{ id: string; sceneId: string; description: string; imageUrl?: string }} - The new storyboard.
+   */
   addStoryboard(sceneId: string, description: string, imageUrl?: string) {
     const storyboard = {
       id: Math.random().toString(36).substr(2, 9),
@@ -376,10 +570,23 @@ class VisualPlanningSystem {
     return storyboard;
   }
 
+  /**
+   * @method getStoryboards
+   * @description Gets the list of storyboards.
+   * @returns {Array<{ id: string; sceneId: string; description: string; imageUrl?: string }>} - The list of storyboards.
+   */
   getStoryboards() {
     return [...this.storyboards];
   }
 
+  /**
+   * @method addBeatSheet
+   * @description Adds a new beat sheet.
+   * @param {number} act - The act number.
+   * @param {string} beat - The beat.
+   * @param {string} description - The description of the beat sheet.
+   * @returns {{ id: string; act: number; beat: string; description: string }} - The new beat sheet.
+   */
   addBeatSheet(act: number, beat: string, description: string) {
     const beatSheet = {
       id: Math.random().toString(36).substr(2, 9),
@@ -391,6 +598,11 @@ class VisualPlanningSystem {
     return beatSheet;
   }
 
+  /**
+   * @method getBeatSheets
+   * @description Gets the list of beat sheets.
+   * @returns {Array<{ id: string; act: number; beat: string; description: string }>} - The list of beat sheets.
+   */
   getBeatSheets() {
     return [...this.beatSheets];
   }
@@ -398,35 +610,80 @@ class VisualPlanningSystem {
 
 // ==================== ARABIC SCREENPLAY CLASSIFIER ====================
 
+/**
+ * @class ScreenplayClassifier
+ * @description A classifier for Arabic screenplays.
+ */
 class ScreenplayClassifier {
-  // Arabic text processing utilities
+  /**
+   * @method stripTashkeel
+   * @description Strips Tashkeel from Arabic text.
+   * @param {string} text - The text to strip.
+   * @returns {string} - The stripped text.
+   */
   static stripTashkeel(text: string): string {
     return text.replace(/[\u064B-\u065F\u0670]/g, '');
   }
 
+  /**
+   * @method normalizeSeparators
+   * @description Normalizes separators in a text.
+   * @param {string} text - The text to normalize.
+   * @returns {string} - The normalized text.
+   */
   static normalizeSeparators(text: string): string {
     return text.replace(/\u2013|\u2014|\u2015/g, '-').replace(/\u060C/g, ',').replace(/\s+/g, ' ');
   }
 
+  /**
+   * @method normalizeLine
+   * @description Normalizes a line of text.
+   * @param {string} input - The line to normalize.
+   * @returns {string} - The normalized line.
+   */
   static normalizeLine(input: string): string {
     return ScreenplayClassifier.stripTashkeel(
       ScreenplayClassifier.normalizeSeparators(input)
     ).replace(/[\u200f\u200e\ufeff\t]+/g, '').trim();
   }
 
+  /**
+   * @method textInsideParens
+   * @description Extracts text inside parentheses.
+   * @param {string} s - The string to extract from.
+   * @returns {string} - The text inside the parentheses.
+   */
   static textInsideParens(s: string): string {
     const match = s.match(/^\s*\((.*?)\)\s*$/);
     return match ? match[1] : '';
   }
 
+  /**
+   * @method hasSentencePunctuation
+   * @description Checks if a string has sentence punctuation.
+   * @param {string} s - The string to check.
+   * @returns {boolean} - True if the string has sentence punctuation, false otherwise.
+   */
   static hasSentencePunctuation(s: string): boolean {
     return /[\.!\؟\?]/.test(s);
   }
 
+  /**
+   * @method wordCount
+   * @description Counts the words in a string.
+   * @param {string} s - The string to count words in.
+   * @returns {number} - The number of words.
+   */
   static wordCount(s: string): number {
     return s.trim() ? s.trim().split(/\s+/).length : 0;
   }
 
+  /**
+   * @method isBlank
+   * @description Checks if a line is blank.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is blank, false otherwise.
+   */
   static isBlank(line: string): boolean {
     return !line || line.trim() === '';
   }
@@ -460,7 +717,12 @@ class ScreenplayClassifier {
     'يأخذ', 'يعطي', 'يضع', 'يرفع', 'يخفض', 'يفتح', 'يغلق', 'يبدأ', 'ينتهي', 'يستمر', 'يتوقف'
   ].join('|');
 
-  // Type checkers
+  /**
+   * @method isBasmala
+   * @description Checks if a line is a Basmala.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is a Basmala, false otherwise.
+   */
   static isBasmala(line: string): boolean {
     // Handle both formats:
     // 1. بسم الله الرحمن الرحيم
@@ -474,11 +736,23 @@ class ScreenplayClassifier {
     return basmalaPatterns.some(pattern => pattern.test(normalizedLine));
   }
 
+  /**
+   * @method isSceneHeaderStart
+   * @description Checks if a line is the start of a scene header.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is the start of a scene header, false otherwise.
+   */
   static isSceneHeaderStart(line: string): boolean {
     // Match Arabic scene headers like "مشهد 1" or "م. 1"
     return /^\s*(?:مشهد|م\.)\s*\d+/i.test(line);
   }
 
+  /**
+   * @method isTransition
+   * @description Checks if a line is a transition.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is a transition, false otherwise.
+   */
   static isTransition(line: string): boolean {
     const transitionPatterns = [
       /^\s*(CUT TO:|FADE (IN|OUT)\.|DISSOLVE TO:|SMASH CUT TO:|MATCH CUT TO:|JUMP CUT TO:)/i,
@@ -488,10 +762,23 @@ class ScreenplayClassifier {
     return transitionPatterns.some(pattern => pattern.test(line));
   }
 
+  /**
+   * @method isParenShaped
+   * @description Checks if a line is parenthetical.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is parenthetical, false otherwise.
+   */
   static isParenShaped(line: string): boolean {
     return /^\s*\(.*?\)\s*$/.test(line);
   }
 
+  /**
+   * @method isCharacterLine
+   * @description Checks if a line is a character line.
+   * @param {string} line - The line to check.
+   * @param {{ lastFormat: string; isInDialogueBlock: boolean }} [context] - The context of the line.
+   * @returns {boolean} - True if the line is a character line, false otherwise.
+   */
   static isCharacterLine(line: string, context?: { lastFormat: string; isInDialogueBlock: boolean }): boolean {
     if (ScreenplayClassifier.isBlank(line) || 
         ScreenplayClassifier.isBasmala(line) || 
@@ -547,6 +834,12 @@ class ScreenplayClassifier {
     return ScreenplayClassifier.ARABIC_PATTERNS.CHARACTER.some(pattern => pattern.test(line)) || arabicCharacterPattern.test(line);
   }
 
+  /**
+   * @method isLikelyAction
+   * @description Checks if a line is likely an action line.
+   * @param {string} line - The line to check.
+   * @returns {boolean} - True if the line is likely an action line, false otherwise.
+   */
   static isLikelyAction(line: string): boolean {
     if (ScreenplayClassifier.isBlank(line) || 
         ScreenplayClassifier.isBasmala(line) || 

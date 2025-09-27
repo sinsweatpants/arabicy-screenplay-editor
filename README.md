@@ -1,73 +1,122 @@
 # Arabic Screenplay Editor
 
-An enhanced editor for writing Arabic screenplays with proper formatting for scene headers, character names, dialogue, and action lines.
+An advanced, feature-rich editor for writing, analyzing, and formatting Arabic screenplays. This tool provides proper formatting for scene headers, character names, dialogue, and action lines, along with a suite of AI-powered agents to enhance the writing process.
+
+## Table of Contents
+
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+- [Usage](#usage)
+  - [Basic Editing](#basic-editing)
+  - [Advanced Agents](#advanced-agents)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- Proper formatting of Arabic scene headers with time and location information
-- Correct identification of character lines (centered and bold)
-- Proper formatting of dialogue (centered)
-- Action lines formatted right-aligned
-- Support for Arabic text with correct RTL (right-to-left) handling
-- Enhanced pattern recognition for complex Arabic screenplay structures
+- **Standard Screenplay Formatting**: Automatically formats your text into standard screenplay elements:
+  - **Scene Headers**: e.g., "مشهد 1 – ليل-داخلي"
+  - **Character Names**: Centered and bold.
+  - **Dialogue**: Centered below the character name.
+  - **Action Lines**: Right-aligned descriptive text.
+  - **Parentheticals**: Italicized and centered.
+  - **Transitions**: e.g., "قطع إلى"
+- **Right-to-Left (RTL) Support**: Full support for Arabic text and layout.
+- **Enhanced Pattern Recognition**: Sophisticated algorithms to correctly identify screenplay elements even in complex structures.
+- **AI-Powered Writing Assistants**: A suite of intelligent agents to help you analyze and improve your screenplay:
+  - **Analysis Agents**: Provide deep insights into character networks, dialogue forensics, thematic mining, and more.
+  - **Creative Agents**: Generate scene ideas, enhance character voices, and help with world-building.
+  - **Predictive & Optimization Agents**: Predict plot points, optimize tension, and analyze audience resonance.
+- **Dark & Light Mode**: Switch between themes for your comfort.
+- **Export & Print**: Save your work or print it directly from the editor.
 
-## Enhanced Pattern Recognition
+## Project Structure
 
-This version includes significant improvements to handle complex Arabic screenplay structures:
+The project is a standard Vite + React + TypeScript application. Here's a brief overview of the key directories:
 
-1. **Expanded Action Verb List**: 60+ Arabic verbs for better action line detection
-2. **Improved Scene Header Processing**: Better handling of complex headers like "مشهد 1 – ليل-داخلي"
-3. **Enhanced Character Line Detection**: Special handling for Arabic character names ending with colons
-4. **Better Action Line Classification**: Improved detection of descriptive sentences
+```
+/
+├── public/           # Static assets
+├── src/
+│   ├── agents/       # AI agent configurations and logic
+│   ├── assets/       # Images, fonts, etc.
+│   ├── components/   # React components
+│   │   └── editor/   # Editor-specific components
+│   ├── config/       # Application-wide configurations (e.g., agent list)
+│   ├── services/     # Helper functions and services
+│   ├── types/        # TypeScript type definitions
+│   ├── App.tsx       # Main application component
+│   └── main.tsx      # Application entry point
+├── package.json      # Project dependencies and scripts
+└── vite.config.ts    # Vite configuration
+```
 
-## Usage
+## Getting Started
 
-1. Open the editor in your browser
-2. Start typing or paste your Arabic screenplay text
-3. The editor will automatically format:
-   - Scene headers (مشهد 1, مشهد 2, etc.)
-   - Character names (centered, bold)
-   - Dialogue (centered)
-   - Action lines (right-aligned)
-   - Transitions (centered, bold)
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-## Supported Elements
+### Prerequisites
 
-- **Basmala**: "بسم الله الرحمن الرحيم"
-- **Scene Headers**: "مشهد 1 – ليل-داخلي", "مشهد 2 – نهار-خارجي", etc.
-- **Character Names**: Lines ending with colons like "ليليث:"
-- **Dialogue**: Text following character names
-- **Action Lines**: Descriptive text (right-aligned)
-- **Transitions**: "قطع", "ذوبان", etc.
+You need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed on your system.
 
-## Test Files
+### Installation
 
-The following test files demonstrate the enhanced formatting capabilities:
+1.  Clone the repository:
+    ```bash
+    git clone <repository-url>
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd arabic-screenplay-editor
+    ```
+3.  Install the dependencies:
+    ```bash
+    npm install
+    ```
 
-1. `src/test-scenario.txt` - Basic test scenario
-2. `src/comprehensive-test.txt` - Comprehensive test with all JSON structure elements
-3. `src/json-structure-test.txt` - Specific test targeting the exact JSON data patterns
-4. `src/final-test.txt` - Complete test with all 10 scenes from the JSON data
+### Running the Application
 
-## Running the Application
+To start the development server, run:
 
 ```bash
 npm run dev
 ```
 
-The application will be available at http://localhost:5174
+The application will be available at `http://localhost:5173` (the port may vary).
 
-## Improvements
+## Usage
 
-This enhanced version includes:
+### Basic Editing
 
-1. **Enhanced Action Verb List**: Expanded to include 60+ Arabic verbs
-2. **Improved Scene Header Pattern Recognition**: Better handling of complex scene headers
-3. **Enhanced Character Line Detection**: Special handling for Arabic text patterns
-4. **Improved Action Line Detection**: Better classification of descriptive sentences
-5. **Enhanced Scene Header Processing**: Proper formatting of complex headers
-6. **Improved Paste Handling**: Better processing of complex scene header structures
-7. **Automatic Dash Removal**: Leading dashes are automatically removed from action lines
-8. **Context-Aware Post-Processing**: Misclassified bullet-point character lines are corrected after initial formatting
+1.  Open the editor in your browser.
+2.  Start typing or paste your Arabic screenplay text into the editor.
+3.  The editor will automatically format the text as you type based on standard screenplay conventions.
+4.  Use the toolbar to apply formatting, search, replace, and access other tools.
+5.  Use the sidebar to change fonts, see document statistics, and use quick-add buttons.
 
-These improvements ensure that Arabic screenplays with complex structures are properly formatted according to industry standards.
+### Advanced Agents
+
+1.  Click on **أدوات (Tools)** in the header menu.
+2.  Select **الوكلاء المتقدمة (Advanced Agents)**.
+3.  In the popup, you can browse available agents for analysis, creative generation, and more.
+4.  Select an agent and click **تشغيل التحليل (Run Analysis)**.
+5.  The results will appear in the "نتائج التحليل (Analysis Results)" tab.
+
+## Contributing
+
+Contributions are welcome! If you have suggestions for improvements or want to add new features, please follow these steps:
+
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/your-feature-name`).
+3.  Make your changes.
+4.  Commit your changes (`git commit -m 'Add some feature'`).
+5.  Push to the branch (`git push origin feature/your-feature-name`).
+6.  Open a Pull Request.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
