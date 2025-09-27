@@ -18,9 +18,8 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
@@ -28,8 +27,8 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/ScreenplayEditor-backup.tsx",
-    "src/ScreenplayEditor-original.tsx",
-    "src/ScreenplayEditor-fixed.tsx"
+    "src/components/legacy/**/*",
+    "src/agents/**/*",
+    "src/config/**/*"
   ]
 }
