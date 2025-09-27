@@ -1,5 +1,5 @@
-import ScreenplayEditor from './ScreenplayEditor';
+import CleanIntegratedScreenplayEditor from './components/editor/CleanIntegratedScreenplayEditor';
 
 export default function App() {
-  return <ScreenplayEditor />;
+  return <CleanIntegratedScreenplayEditor />;
 }
