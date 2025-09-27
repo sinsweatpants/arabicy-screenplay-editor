@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "npm run test:build && npm run test:run",
+    "test:build": "tsc -p tsconfig.test.json",
+    "test:run": "node --test --experimental-specifier-resolution=node .test-build/tests"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
