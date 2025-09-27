@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} CULTURAL_HISTORICAL_ANALYZER_AGENT_CONFIG
+ * @description Configuration for the ChronoContext AI agent.
+ * This advanced cultural-historical context analyzer uses comprehensive historical databases
+ * with algorithms for verifying chronological and cultural accuracy. It is equipped with models
+ * for detecting cultural biases and analyzing social sensitivity, with capabilities for assessing
+ * historical authenticity, fair cultural representation, and predicting potential societal reactions.
+ */
+export const CULTURAL_HISTORICAL_ANALYZER_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.CULTURAL_HISTORICAL_ANALYZER,
     name: "ChronoContext AI",
     description: "الوحدة 7 - سياق الزمن الثقافي: محلل سياق ثقافي تاريخي متطور يستخدم قواعد بيانات تاريخية شاملة مع خوارزميات التحقق من الدقة الزمنية والثقافية، مزود بنماذج كشف التحيزات الثقافية وتحليل الحساسية الاجتماعية، مع قدرات تقييم الأصالة التاريخية والتمثيل الثقافي العادل والتنبؤ بردود الفعل المجتمعية المحتملة.",
     category: TaskCategory.ADVANCED_MODULES,

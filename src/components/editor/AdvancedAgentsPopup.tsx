@@ -9,6 +9,16 @@ import {
 // Import agent configurations
 // import { AGENT_CONFIGS } from '../../config/agentConfigs';
 
+/**
+ * @interface Agent
+ * @description Represents an agent with its properties.
+ * @property {string} id - The unique identifier of the agent.
+ * @property {string} name - The name of the agent.
+ * @property {string} description - The description of the agent.
+ * @property {string} category - The category of the agent.
+ * @property {{ creativeGeneration: boolean; analyticalReasoning: boolean; emotionalIntelligence: boolean; [key: string]: any; }} capabilities - The capabilities of the agent.
+ * @property {string} systemPrompt - The system prompt for the agent.
+ */
 interface Agent {
   id: string;
   name: string;
@@ -23,18 +33,38 @@ interface Agent {
   systemPrompt: string;
 }
 
+/**
+ * @interface AgentResult
+ * @description Represents the result of an agent's analysis.
+ * @property {string} agentName - The name of the agent that produced the result.
+ * @property {string} result - The result of the analysis.
+ * @property {Date} timestamp - The timestamp of the analysis.
+ */
 interface AgentResult {
   agentName: string;
   result: string;
   timestamp: Date;
 }
 
+/**
+ * @interface AdvancedAgentsPopupProps
+ * @description Represents the props for the AdvancedAgentsPopup component.
+ * @property {boolean} isOpen - Whether the popup is open or not.
+ * @property {() => void} onClose - The function to call when the popup is closed.
+ * @property {string} content - The content to be analyzed by the agents.
+ */
 interface AdvancedAgentsPopupProps {
   isOpen: boolean;
   onClose: () => void;
   content: string;
 }
 
+/**
+ * @component AdvancedAgentsPopup
+ * @description A popup component for advanced agent analysis of a screenplay.
+ * @param {AdvancedAgentsPopupProps} props - The props for the component.
+ * @returns {JSX.Element | null} - The rendered component or null if not open.
+ */
 const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClose, content }) => {
   const [activeTab, setActiveTab] = useState<'agents' | 'results'>('agents');
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
@@ -54,7 +84,10 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     systemPrompt: config.systemPrompt
   })); */
 
-  // Filter agents based on search term
+  /**
+   * @effect
+   * @description Filters the agents based on the search term.
+   */
   useEffect(() => {
     if (searchTerm) {
       const filtered = agents.filter(agent => 
@@ -68,6 +101,12 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     }
   }, [searchTerm]);
 
+  /**
+   * @function runAgentAnalysis
+   * @description Runs the analysis for a given agent.
+   * @param {Agent} agent - The agent to run the analysis with.
+   * @returns {Promise<void>}
+   */
   const runAgentAnalysis = async (agent: Agent) => {
     setSelectedAgent(agent);
     setIsAnalyzing(true);
@@ -151,6 +190,12 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     }
   };
 
+  /**
+   * @function getCategoryIcon
+   * @description Gets the icon for a given category.
+   * @param {string} category - The category to get the icon for.
+   * @returns {JSX.Element} - The icon component.
+   */
   const getCategoryIcon = (category: string) => {
     switch(category) {
       case 'CORE': return <Brain className="w-5 h-5" />;
@@ -162,6 +207,12 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     }
   };
 
+  /**
+   * @function getCategoryColor
+   * @description Gets the color for a given category.
+   * @param {string} category - The category to get the color for.
+   * @returns {string} - The color class.
+   */
   const getCategoryColor = (category: string) => {
     switch(category) {
       case 'CORE': return 'bg-blue-100 text-blue-800';

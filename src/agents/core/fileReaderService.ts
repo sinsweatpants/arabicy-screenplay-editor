@@ -1,7 +1,28 @@
-
-import { TaskCategory, TaskType } from '../types/types';
 import mammoth from 'mammoth';
 
+/**
+ * @interface ProcessedFile
+ * @description Represents a file that has been processed and is ready for use, for example, with the Gemini API.
+ * @property {string} name - The name of the file.
+ * @property {string} mimeType - The MIME type of the file.
+ * @property {string} content - The processed content of the file (text or Base64).
+ * @property {boolean} isBase64 - A flag indicating if the content is Base64 encoded.
+ * @property {number} size - The size of the file in bytes.
+ */
+export interface ProcessedFile {
+  name: string;
+  mimeType: string;
+  content: string;
+  isBase64: boolean;
+  size: number;
+}
+
+/**
+ * @function readFileAsText
+ * @description Reads a file and returns its content as a text string.
+ * @param {File} file - The file to read.
+ * @returns {Promise<string>} A promise that resolves with the text content of the file.
+ */
 const readFileAsText = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -11,6 +32,12 @@ const readFileAsText = (file: File): Promise<string> => {
   });
 };
 
+/**
+ * @function readFileAsBase64
+ * @description Reads a file and returns its content as a Base64 encoded string, without the data URL prefix.
+ * @param {File} file - The file to read.
+ * @returns {Promise<string>} A promise that resolves with the Base64 content of the file.
+ */
 const readFileAsBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -24,6 +51,12 @@ const readFileAsBase64 = (file: File): Promise<string> => {
   });
 };
 
+/**
+ * @function readFileAsArrayBuffer
+ * @description Reads a file and returns its content as an ArrayBuffer. This is useful for binary files like DOCX.
+ * @param {File} file - The file to read.
+ * @returns {Promise<ArrayBuffer>} A promise that resolves with the ArrayBuffer content of the file.
+ */
 const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -33,6 +66,15 @@ const readFileAsArrayBuffer = (file: File): Promise<ArrayBuffer> => {
   });
 };
 
+/**
+ * @function processFilesForGemini
+ * @description Processes an array of files to prepare them for use with the Gemini API.
+ * It handles different MIME types, reading text files as text, DOCX files by extracting text,
+ * and other files (like PDFs and images) as Base64 strings. It also gracefully handles
+ * unsupported types and read errors.
+ * @param {File[]} files - An array of File objects to process.
+ * @returns {Promise<ProcessedFile[]>} A promise that resolves with an array of ProcessedFile objects.
+ */
 export const processFilesForGemini = async (files: File[]): Promise<ProcessedFile[]> => {
   return Promise.all(
     files.map(async (file): Promise<ProcessedFile> => {

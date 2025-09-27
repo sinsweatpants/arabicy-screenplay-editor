@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} PLOT_PREDICTOR_AGENT_CONFIG
+ * @description Configuration for the NarrativeOracle AI agent.
+ * This advanced plot predictor uses specialized Transformer models with Monte Carlo Tree Search
+ * techniques to foresee potential plot developments. It is equipped with sequential learning
+ * algorithms and extensive narrative pattern databases, with capabilities for evaluating the
+ * probability and creativity of alternative paths.
+ */
+export const PLOT_PREDICTOR_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.PLOT_PREDICTOR,
     name: "NarrativeOracle AI",
     description: "وكيل الوحي السردي: متنبئ حبكة متطور يستخدم نماذج Transformer المتخصصة مع تقنيات Monte Carlo Tree Search لاستشراف التطورات المحتملة للحبكة، مزود بخوارزميات التعلم التسلسلي وقواعد بيانات الأنماط السردية الواسعة، مع قدرات تقييم الاحتمالية والإبداعية للمسارات البديلة.",
     category: TaskCategory.PREDICTIVE,

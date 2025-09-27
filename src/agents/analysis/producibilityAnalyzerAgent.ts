@@ -1,6 +1,16 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+/**
+ * @const {AIAgentConfig} PRODUCIBILITY_ANALYZER_AGENT_CONFIG
+ * @description Configuration for the ProductionOracle AI agent.
+ * This advanced producibility analyzer uses intelligent cost estimation models with complex
+ * production simulation algorithms to analyze and estimate production requirements with high accuracy.
+ * It is equipped with databases of locations, equipment, and technical personnel, with capabilities
+ * for logistical analysis, predicting production challenges, and innovative alternative solutions.
+ */
+export const PRODUCIBILITY_ANALYZER_AGENT_CONFIG: AIAgentConfig = {
+    id: TaskType.PRODUCIBILITY_ANALYZER,
     name: "ProductionOracle AI",
     description: "الوحدة 8 - وحي الإنتاج الذكي: محلل قابلية إنتاج متطور يستخدم نماذج تقدير التكاليف الذكية مع خوارزميات محاكاة الإنتاج المعقدة لتحليل وتقدير متطلبات الإنتاج بدقة عالية، مزود بقواعد بيانات المواقع والمعدات والكوادر الفنية، مع قدرات التحليل اللوجستي والتنبؤ بالتحديات الإنتاجية والحلول البديلة المبتكرة.",
     category: TaskCategory.ADVANCED_MODULES,

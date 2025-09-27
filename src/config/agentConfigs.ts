@@ -1,3 +1,8 @@
+/**
+ * @file This file centralizes all agent configurations, making them easily accessible throughout the application.
+ * It imports individual agent configurations and exports them as a single, frozen array to prevent modifications at runtime.
+ */
+
 // Export all agent configurations
 import { ANALYSIS_AGENT_CONFIG } from '../agents/analysis/analysisAgent.ts';
 import { CREATIVE_AGENT_CONFIG } from '../agents/creativeAgent.ts';
@@ -27,6 +32,11 @@ import { LITERARY_QUALITY_ANALYZER_AGENT_CONFIG } from '../agents/analysis/liter
 import { RECOMMENDATIONS_GENERATOR_AGENT_CONFIG } from '../agents/recommendationsGeneratorAgent.ts';
 import { ADAPTIVE_REWRITING_AGENT_CONFIG } from '../agents/adaptiveRewritingAgent.ts';
 
+/**
+ * @const {ReadonlyArray<AgentConfig>} AGENT_CONFIGS
+ * @description A frozen array of all agent configurations, categorized for clarity.
+ * This structure ensures that the configurations cannot be altered at runtime, providing stability.
+ */
 export const AGENT_CONFIGS = Object.freeze([
   // === CORE FOUNDATIONAL AGENTS ===
   ANALYSIS_AGENT_CONFIG,
