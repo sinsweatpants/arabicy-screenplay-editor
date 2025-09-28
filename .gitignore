@@ -8,22 +8,11 @@ pnpm-debug.log*
 lerna-debug.log*
 .yarn-integrity
 
-# Dotenv files
-.env.local
+# Environment variables
+# Ignore all .env files, but not .env.example which is used as a template.
 .env
-.env.example
-.env.test
-.env.development
-.env.production
-.env.staging
-.env.example.local
-.env.test.local
-.env.development.local
-.env.production.local
-.env.staging.local
-.env.example.local
-.env.staging.local
-.env.example.staging
+.env.*
+!.env.example
 
 # Dependency directories
 node_modules
@@ -69,7 +58,3 @@ profiler_results
 
 # Playwright test results
 playwright-report
-
-# Environment variables
-.env
-.env.local
