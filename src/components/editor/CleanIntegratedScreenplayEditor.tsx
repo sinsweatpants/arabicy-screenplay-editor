@@ -410,19 +410,13 @@ export class AIWritingAssistant {
    * @param {any} options - The generation options.
    * @returns {Promise<any>} - The generated text and suggestions.
    */
-  async generateText(prompt: string, context: string, options: any = {}) {
+  async generateText(prompt: string, context: string, options: any = {}): Promise<{ text?: string }> {
     // In a real implementation, this would call an AI service
     // For now, we'll simulate the response
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          success: true,
-          text: `نص مُولد بواسطة الذكاء الاصطناعي استنادًا إلى: "${prompt}"\n\nهذا نص تجريبي يُظهر كيف يمكن للمساعد إنشاء محتوى مفيد للمؤلف.`,
-          suggestions: [
-            "اقتراح 1: تحسين تدفق الحوار",
-            "اقتراح 2: إضافة تفاصيل وصفية",
-            "اقتراح 3: تطوير الشخصية"
-          ]
+          text: `نص مُولد بواسطة الذكاء الاصطناعي استنادًا إلى: "${prompt}"\n\nهذا نص تجريبي يُظهر كيف يمكن للمساعد إنشاء محتوى مفيد للمؤلف.`
         });
       }, 1500);
     });
@@ -1086,7 +1080,7 @@ export class ScreenplayClassifier {
       lastFormat = 'action';
     });
 
-    if (currentScene && !currentScene.endLineNumber) {
+    if (currentScene) {
       currentScene.endLineNumber = rawLines.length;
     }
 

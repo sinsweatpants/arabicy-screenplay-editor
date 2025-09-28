@@ -126,7 +126,7 @@ export interface AIAgentConfig {
     category: TaskCategory | string;
     taskType?: TaskType;
     instructions?: string;
-    capabilities?: string[];
+    capabilities?: string[] | Record<string, boolean | string | number>;
     modelConfig?: {
         temperature?: number;
         maxTokens?: number;

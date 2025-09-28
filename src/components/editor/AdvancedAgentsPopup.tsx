@@ -9,6 +9,9 @@ import {
 import { AnalysisAgent } from '../../agents/analysis/analysisAgent';
 import { CharacterDeepAnalyzerAgent } from '../../agents/analysis/characterDeepAnalyzerAgent';
 import { environment } from '../../config/environment';
+import { AGENT_CONFIGS } from '../../config/agentConfigs';
+import type { ProcessedFile } from '../../agents/core/fileReaderService';
+import type { AIAgentConfig } from '../../types/types';
 
 /**
  * @interface Agent
@@ -29,7 +32,7 @@ interface Agent {
     creativeGeneration: boolean;
     analyticalReasoning: boolean;
     emotionalIntelligence: boolean;
-    [key: string]: any;
+    [key: string]: boolean | string | number;
   };
   systemPrompt: string;
 }
@@ -79,13 +82,43 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
   const characterDeepAnalyzerAgent = new CharacterDeepAnalyzerAgent(environment.geminiApiKey);
   
   // Initialize agents from configs
-  const agents: Agent[] = AGENT_CONFIGS.map(config => ({
-    id: config.id,
+  const agents: Agent[] = AGENT_CONFIGS.map((config: AIAgentConfig) => ({
+    id: config.id || 'unknown',
     name: config.name,
     description: config.description,
-    category: config.category,
-    capabilities: config.capabilities,
-    systemPrompt: config.systemPrompt
+    category: typeof config.category === 'string' ? config.category : 'UNKNOWN',
+    capabilities: (() => {
+      if (!config.capabilities) {
+        return { creativeGeneration: false, analyticalReasoning: false, emotionalIntelligence: false };
+      }
+
+      // Handle string array capabilities
+      if (Array.isArray(config.capabilities)) {
+        return {
+          creativeGeneration: config.capabilities.includes('creativeGeneration'),
+          analyticalReasoning: config.capabilities.includes('analyticalReasoning'),
+          emotionalIntelligence: config.capabilities.includes('emotionalIntelligence'),
+          ...Object.fromEntries(config.capabilities.map(cap => [cap, true]))
+        };
+      }
+
+      // Handle object capabilities
+      return {
+        creativeGeneration: Boolean(config.capabilities.creativeGeneration),
+        analyticalReasoning: Boolean(config.capabilities.analyticalReasoning),
+        emotionalIntelligence: Boolean(config.capabilities.emotionalIntelligence),
+        ...Object.fromEntries(
+          Object.entries(config.capabilities).map(([key, value]) => [
+            key,
+            typeof value === 'boolean' ? value :
+            typeof value === 'string' ? value :
+            typeof value === 'number' ? value :
+            String(value)
+          ])
+        )
+      };
+    })(),
+    systemPrompt: config.systemPrompt || ''
   }));
 
   /**
@@ -232,8 +265,15 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     setIsAnalyzing(true);
     setAgentOutput('');
     try {
+      const processedFile: ProcessedFile = {
+        name: 'screenplay.txt',
+        content: content,
+        mimeType: 'text/plain',
+        isBase64: false,
+        size: content.length
+      };
       const result = await analysisAgent.execute(
-        [{ name: 'screenplay.txt', content: content, mimeType: 'text/plain', isBase64: false }],
+        [processedFile],
         '',
         ''
       );
