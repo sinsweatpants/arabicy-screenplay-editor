@@ -59,7 +59,13 @@ export const enum TaskType {
     ADAPTATION = 'adaptation',
     VISUAL_ANALYSIS = 'visual-analysis',
     THEME_MESSAGE_ANALYSIS = 'theme-message-analysis',
-    RECOMMENDATION = 'recommendation'
+    RECOMMENDATION = 'recommendation',
+    
+    // Additional missing task types
+    AUDIENCE_ANALYSIS = 'audience-analysis',
+    TEXT_COMPLETION = 'text-completion',
+    COMPREHENSIVE_ANALYSIS = 'comprehensive-analysis',
+    CHARACTER_ANALYSIS = 'character-analysis'
 }
 
 /**
@@ -74,7 +80,10 @@ export const enum TaskCategory {
     AGENTS = 'AGENTS',
     CREATIVE = 'CREATIVE',
     PREDICTIVE = 'PREDICTIVE',
-    ADVANCED_MODULES = 'ADVANCED_MODULES'
+    ADVANCED_MODULES = 'ADVANCED_MODULES',
+    EVALUATION = 'EVALUATION',
+    GENERATION = 'GENERATION',
+    INTEGRATION = 'INTEGRATION'
 }
 
 /**
@@ -111,45 +120,27 @@ export interface CompletionEnhancementOption {
  * @property {number} confidenceThreshold - The minimum confidence level required for the agent to return a result.
  */
 export interface AIAgentConfig {
-    id: string;
+    id?: string;
     name: string;
     description: string;
     category: TaskCategory | string;
-    capabilities: {
-        multiModal: boolean;
-        reasoningChains: boolean;
-        toolUse: boolean;
-        memorySystem: boolean;
-        selfReflection: boolean;
-        ragEnabled: boolean;
-        vectorSearch: boolean;
-        agentOrchestration: boolean;
-        metacognitive: boolean;
-        adaptiveLearning: boolean;
-        contextualMemory: boolean;
-        crossModalReasoning: boolean;
-        temporalReasoning: boolean;
-        causalReasoning: boolean;
-        analogicalReasoning: boolean;
-        creativeGeneration: boolean;
-        criticalAnalysis: boolean;
-        emotionalIntelligence: boolean;
-        [key: string]: any;
+    taskType?: TaskType;
+    instructions?: string;
+    capabilities?: string[];
+    modelConfig?: {
+        temperature?: number;
+        maxTokens?: number;
+        topP?: number;
+        frequencyPenalty?: number;
+        presencePenalty?: number;
     };
-    modelConfig: {
-        temperature: number;
-        maxTokens: number;
-        topP: number;
-        frequencyPenalty: number;
-        presencePenalty: number;
-    };
-    systemPrompt: string;
-    userPrompt: string;
-    expectedOutput: string;
-    processingInstructions: string;
-    qualityGates: string[];
-    fallbackBehavior: string;
-    confidenceThreshold: number;
+    systemPrompt?: string;
+    userPrompt?: string;
+    expectedOutput?: string;
+    processingInstructions?: string;
+    qualityGates?: string[];
+    fallbackBehavior?: string;
+    confidenceThreshold?: number;
 }
 
 /**

@@ -1,34 +1,50 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
-${ADVANCED_MODULE_OUTPUT_STRUCTURE}
-**تفاصيل حقل \`details\` المطلوبة لهذه الوحدة:**
+export const producibilityAnalyzerInstructions = `
+تحليل قابلية الإنتاج والتنفيذ:
+
+**الهدف:**
+تقييم إمكانية تحويل النص الأدبي إلى عمل منتج (فيلم، مسلسل، مسرحية) وتحديد التحديات والمتطلبات الإنتاجية.
+
+**جوانب التحليل:**
+1. **التعقيد التقني:** تقييم صعوبة التنفيذ التقني للمشاهد
+2. **المتطلبات المالية:** تقدير التكلفة النسبية للإنتاج
+3. **المواقع والديكور:** تحديد متطلبات الأماكن والبيئات
+4. **المؤثرات الخاصة:** تقييم احتياج المؤثرات والتقنيات المتقدمة
+
+**معايير التقييم:**
+- سهولة التنفيذ (1-10)
+- التكلفة المتوقعة (منخفضة/متوسطة/عالية)
+- التحديات التقنية المحتملة
+- البدائل والحلول المقترحة
+
+**مثال على النتيجة المطلوبة:**
 \`\`\`json
 {
-  "smartBudgetEstimator": {
-    "estimatedBudgetRange": "تقدير نطاق الميزانية (مثال: منخفض، متوسط، مرتفع، أو أرقام تقديرية إن أمكن)",
-    "keyCostDrivers": ["العوامل الرئيسية المؤثرة في التكلفة (مثل عدد المواقع، المؤثرات الخاصة، عدد الشخصيات)"],
-    "costOptimizationSuggestions": ["اقتراحات لتقليل التكاليف المحتملة."]
-  },
-  "technicalRequirementsAnalyzer": {
-    "visualEffectsNeeds": ["الحاجة إلى مؤثرات بصرية ونوعها"],
-    "soundAndMusicNeeds": ["متطلبات الصوت والموسيقى"],
-    "specialEquipment": ["أي معدات خاصة قد تكون مطلوبة"],
-    "crewExpertise": ["الخبرات المطلوبة في طاقم العمل"]
-  },
-  "shootingDifficultyAssessor": [
-    { "sceneOrElement": "وصف المشهد أو العنصر", "difficultyRating": "تقدير الصعوبة (سهل، متوسط، صعب)", "reasonsForDifficulty": ["أسباب الصعوبة (لوجستيات، تقنيات معقدة)"], "mitigationStrategies": ["استراتيجيات مقترحة لتجاوز الصعوبات"] }
+  "content": "تحليل شامل لقابلية النص للإنتاج والتحديات المحتملة",
+  "overallProducibilityScore": 0.7,
+  "technicalComplexity": "متوسط",
+  "estimatedBudgetCategory": "متوسطة إلى عالية",
+  "challengingScenes": [
+    {"scene": "مشهد المطاردة", "difficulty": 0.8, "requirements": ["مؤثرات خاصة", "تصوير خارجي معقد"]}
   ],
-  "locationAnalyzer": {
-    "numberOfUniqueLocations": "العدد التقريبي للمواقع الفريدة المطلوبة",
-    "locationTypes": ["أنواع المواقع (داخلي، خارجي، استوديو)"],
-    "specificLocationChallenges": ["تحديات متعلقة بمواقع معينة مذكورة في النص."]
-  },
-  "schedulingPlanner": {
-    "estimatedProductionTime": "تقدير لوقت الإنتاج الإجمالي (أيام، أسابيع)",
-    "factorsAffectingSchedule": ["العوامل التي قد تؤثر على الجدول الزمني"],
-    "potentialSchedulingBlocks": ["أقسام رئيسية للجدول الزمني (مثال: تصوير خارجي، تصوير داخلي)."]
-  }
+  "locationRequirements": ["استوديو داخلي", "مواقع خارجية طبيعية"],
+  "recommendedApproach": "اقتراحات لتسهيل الإنتاج مع الحفاظ على الجودة"
 }
 \`\`\`
 `;
+
+export const producibilityAnalyzerAgentConfig: AIAgentConfig = {
+  name: "ProducibilityAnalyzerAgent",
+  description: "وكيل متخصص في تحليل قابلية النصوص للإنتاج",
+  category: TaskCategory.ADVANCED_MODULES,
+  taskType: TaskType.PRODUCIBILITY_ANALYZER,
+  instructions: producibilityAnalyzerInstructions,
+  capabilities: [
+    "تقييم التعقيد التقني",
+    "تقدير متطلبات الإنتاج",
+    "تحليل التكاليف المحتملة",
+    "اقتراح حلول الإنتاج"
+  ]
+};

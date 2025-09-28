@@ -1,33 +1,50 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
-${ADVANCED_MODULE_OUTPUT_STRUCTURE}
-**تفاصيل حقل \`details\` المطلوبة لهذه الوحدة:**
+export const targetAudienceAnalyzerInstructions = `
+تحليل الجمهور المستهدف:
+
+**الهدف:**
+تحديد وتحليل الجمهور المستهدف للعمل الأدبي وتقييم مدى ملاءمته لفئات جماهيرية مختلفة.
+
+**العناصر المطلوب تحليلها:**
+1. **التحليل الديموغرافي:** الفئات العمرية والثقافية
+2. **الاهتمامات والتفضيلات:** ما يجذب كل فئة
+3. **مستوى المحتوى:** ملاءمة اللغة والمواضيع
+4. **قنوات الوصول:** أفضل طرق للوصول للجمهور
+
+**النتائج المطلوبة:**
+- تحديد الجمهور الأساسي والثانوي
+- تقييم مدى مناسبة المحتوى
+- توقعات مستوى التفاعل
+- استراتيجيات الوصول للجمهور
+
+**مثال على النتيجة المطلوبة:**
 \`\`\`json
 {
-  "demographicsIdentifier": {
-    "primaryTargetAudience": { "ageRange": "الفئة العمرية", "gender": "الجنس", "interests": ["الاهتمامات"] },
-    "secondaryTargetAudiences": [{ "description": "وصف جمهور ثانوي محتمل" }],
-    "justificationForSelection": "مبررات اختيار هذه الفئات الجماهيرية بناءً على محتوى النص."
+  "content": "تحليل شامل للجمهور المستهدف ومدى ملاءمة المحتوى",
+  "primaryAudience": {
+    "ageRange": "25-45 سنة",
+    "culturalBackground": ["الجمهور العربي المثقف"],
+    "interests": ["الأدب المعاصر", "القضايا الاجتماعية"]
   },
-  "expectationsAnalyzer": {
-    "audienceExpectationsBasedOnGenre": "توقعات الجمهور بناءً على نوع العمل (إذا كان واضحًا).",
-    "expectationsFromThemesAndPlot": "التوقعات الناشئة عن الموضوعات والحبكة.",
-    "howWellTextMeetsExpectations": "مدى تلبية النص لهذه التوقعات أو تحديها بشكل فعال."
-  },
-  "attractionAssessor": {
-    "keyAttractionFactors": ["عوامل الجذب الرئيسية في النص (قصة، شخصيات، أسلوب، موضوع)"],
-    "uniqueSellingPoints": ["نقاط البيع الفريدة التي تميز العمل."],
-    "potentialWeaknessesInAppeal": ["نقاط ضعف محتملة في جاذبية العمل لفئات معينة."]
-  },
-  "sensitiveContentDetectorForAudience": [
-    { "elementDescription": "وصف العنصر الحساس", "targetAudienceSegment": "الفئة الجماهيرية التي قد تجده حساسًا", "potentialReaction": "رد الفعل المحتمل", "mitigationSuggestion": "اقتراح للتعامل معه أو تعديله." }
-  ],
-  "marketabilityAnalyzer": {
-    "overallMarketabilityScore": 0.7,
-    "marketingAngles": ["زوايا تسويقية محتملة للعمل"],
-    "comparisonToSimilarWorksInMarket": "مقارنة بأعمال مشابهة في السوق."
-  }
+  "appropriatenessScore": 0.8,
+  "engagementPrediction": 0.75,
+  "recommendations": ["توصيات للوصول الأمثل للجمهور"]
 }
 \`\`\`
 `;
+
+export const targetAudienceAnalyzerAgentConfig: AIAgentConfig = {
+  name: "TargetAudienceAnalyzerAgent",
+  description: "وكيل متخصص في تحليل الجمهور المستهدف",
+  category: TaskCategory.ADVANCED_MODULES,
+  taskType: TaskType.TARGET_AUDIENCE_ANALYZER,
+  instructions: targetAudienceAnalyzerInstructions,
+  capabilities: [
+    "تحليل الخصائص الديموغرافية",
+    "تقييم ملاءمة المحتوى",
+    "التنبؤ بمستوى التفاعل",
+    "تقييم الجاذبية عبر الفئات"
+  ]
+};
