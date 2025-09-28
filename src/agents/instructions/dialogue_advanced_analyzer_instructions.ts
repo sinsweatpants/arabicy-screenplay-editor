@@ -1,42 +1,50 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
-${ADVANCED_MODULE_OUTPUT_STRUCTURE}
-**تفاصيل حقل \`details\` المطلوبة لهذه الوحدة:**
+export const dialogueAdvancedAnalyzerInstructions = `
+التحليل المتقدم للحوار:
+
+**الهدف:**
+تحليل عميق وشامل لجودة الحوار في النص من خلال معايير تقنية ولغوية متطورة.
+
+**محاور التحليل:**
+1. **الطبيعية والواقعية:** مدى قرب الحوار من الكلام الطبيعي
+2. **التمييز بين الأصوات:** وضوح هوية كل شخصية من خلال كلامها
+3. **الوظائف الدرامية:** دور الحوار في تطوير السرد والشخصيات
+4. **الإيقاع والتدفق:** انسيابية الحوار وتناغمه
+
+**العناصر التقنية:**
+- **البنية اللغوية:** تحليل القواعد والأسلوب
+- **المضمون العاطفي:** قوة التعبير عن المشاعر
+- **التوقيت والإيقاع:** مناسبة طول وإيقاع الجمل
+- **الوضوح والفهم:** سهولة متابعة وفهم الحوار
+
+**مثال على النتيجة المطلوبة:**
 \`\`\`json
 {
-  "distinctiveVoicesAnalyzer": [
-    {
-      "characterName": "اسم الشخصية",
-      "voiceUniquenessScore": 0.8,
-      "linguisticMarkers": ["استخدام مفردات معينة", "نمط جمل شائع"],
-      "voiceConsistencyEvaluation": "تقييم مدى اتساق صوت الشخصية عبر النص."
-    }
-  ],
-  "subtextDetector": [
-    {
-      "dialogueSnippet": "مقتطف من الحوار",
-      "speaker": "اسم المتحدث",
-      "surfaceMeaning": "المعنى الحرفي الظاهري",
-      "inferredSubtext": "المعنى الضمني أو المخفي",
-      "emotionalUndertones": ["العاطفة 1", "العاطفة 2"],
-      "subtextSignificance": "أهمية هذا النص الفرعي في السياق."
-    }
-  ],
-  "naturalismAssessor": {
-    "overallNaturalismScore": 0.65,
-    "naturalismEvaluation": "تقييم مدى واقعية الحوار بشكل عام، مع ذكر نقاط القوة والضعف.",
-    "comparisonToRealSpeechPatterns": "مقارنة بأنماط الكلام الواقعية (إذا أمكن).",
-    "clicheDialogueDetector": [
-       { "clicheExample": "مثال على حوار مبتذل", "location": "موقع الكليشيه في النص", "suggestion": "اقتراح لتحسينه" }
-    ]
-  },
-  "linguisticRhythmAnalyzer": {
-    "overallDialoguePacing": "سريع/بطيء/متنوع",
-    "rhythmPatternsObserved": ["أنماط إيقاعية ملحوظة في الحوار"],
-    "musicOfSpeechEvaluation": "تقييم الجانب الموسيقي أو الإيقاعي للحوار."
-  }
+  "content": "تحليل متقدم وشامل لجودة وفعالية الحوار",
+  "overallDialogueScore": 0.8,
+  "naturalness": {"score": 0.7, "analysis": "الحوار طبيعي مع بعض المواضع المتكلفة"},
+  "voiceDistinction": {"score": 0.9, "analysis": "تمييز واضح بين أصوات الشخصيات"},
+  "dramaticFunction": {"score": 0.8, "analysis": "الحوار يخدم السرد بشكل فعال"},
+  "rhythmAndFlow": {"score": 0.7, "analysis": "إيقاع جيد مع إمكانية للتحسين"},
+  "keyStrengths": ["نقاط القوة في الحوار"],
+  "improvementSuggestions": ["اقتراحات محددة للتطوير"],
+  "exemplaryDialogue": ["أمثلة على الحوار المتميز في النص"]
 }
 \`\`\`
-**العملية:** ركز على تحليل الحوار من الزوايا المذكورة، وقدم أمثلة عند الضرورة.
 `;
+
+export const dialogueAdvancedAnalyzerAgentConfig: AIAgentConfig = {
+  name: "DialogueAdvancedAnalyzerAgent",
+  description: "وكيل متخصص في التحليل المتقدم للحوار",
+  category: TaskCategory.ADVANCED_MODULES,
+  taskType: TaskType.DIALOGUE_ADVANCED_ANALYZER,
+  instructions: dialogueAdvancedAnalyzerInstructions,
+  capabilities: [
+    "تحليل الطبيعية والواقعية",
+    "تقييم التمييز بين الأصوات",
+    "تحليل الوظائف الدرامية",
+    "قياس الإيقاع والتدفق"
+  ]
+};
