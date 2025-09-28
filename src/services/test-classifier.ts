@@ -26,6 +26,12 @@ class ScreenplayClassifier {
   static readonly PARENTHETICAL_SHAPE_RE = /^\s*\(.*?\)\s*$/;
 
   // Helper functions
+  /**
+   * Converts Eastern Arabic digits to their Western Arabic equivalents.
+   *
+   * @param {string} s - The source string that may contain Eastern Arabic numerals.
+   * @returns {string} The normalized string containing only Western digits.
+   */
   static easternToWesternDigits(s: string) {
     const map: { [key: string]: string } = {
       '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
@@ -34,54 +40,127 @@ class ScreenplayClassifier {
     return s.replace(/[٠١٢٣٤٥٦٧٨٩]/g, (char: string) => map[char]);
   }
 
+  /**
+   * Removes Arabic diacritic marks (tashkeel) from a string.
+   *
+   * @param {string} s - The input string to normalize.
+   * @returns {string} The string without diacritic characters.
+   */
   static stripTashkeel(s: string) {
     return s.replace(/[\u064B-\u065F\u0670]/g, '');
   }
 
+  /**
+   * Standardizes punctuation and spacing separators used in screenplay text.
+   *
+   * @param {string} s - The raw line of dialogue or action text.
+   * @returns {string} The string with consistent separators and whitespace.
+   */
   static normalizeSeparators(s: string) {
     return s.replace(/[-–—]/g, '-').replace(/[،,]/g, ',').replace(/\s+/g, ' ');
   }
 
+  /**
+   * Produces a whitespace-trimmed and punctuation-normalized version of a screenplay line.
+   *
+   * @param {string} input - The line to normalize.
+   * @returns {string} The normalized line ready for classification heuristics.
+   */
   static normalizeLine(input: string) {
     return ScreenplayClassifier.stripTashkeel(
       ScreenplayClassifier.normalizeSeparators(input)
     ).replace(/[\u200f\u200e\ufeff\t]+/g, '').trim();
   }
 
+  /**
+   * Extracts the text contained within parentheses, if present.
+   *
+   * @param {string} s - The string that may include parentheses.
+   * @returns {string} The text found inside the parentheses or an empty string if none exist.
+   */
   static textInsideParens(s: string) {
     const match = s.match(/^\s*\((.*?)\)\s*$/);
     return match ? match[1] : '';
   }
 
+  /**
+   * Checks whether a string includes sentence-ending punctuation marks.
+   *
+   * @param {string} s - The text to inspect.
+   * @returns {boolean} True when punctuation is detected; otherwise false.
+   */
   static hasSentencePunctuation(s: string) {
     return /[\.!\؟\?]/.test(s);
   }
 
+  /**
+   * Counts the number of whitespace-delimited tokens in a string.
+   *
+   * @param {string} s - The text to evaluate.
+   * @returns {number} The total number of detected words.
+   */
   static wordCount(s: string) {
     return s.trim() ? s.trim().split(/\s+/).length : 0;
   }
 
+  /**
+   * Determines if a line is empty or contains only whitespace characters.
+   *
+   * @param {string} line - The line to inspect.
+   * @returns {boolean} True when the line has no substantive characters; otherwise false.
+   */
   static isBlank(line: string) {
     return !line || line.trim() === '';
   }
 
   // Type checkers
+  /**
+   * Detects whether a line corresponds to the Islamic basmala invocation.
+   *
+   * @param {string} line - The screenplay line to evaluate.
+   * @returns {boolean} True when the line is a basmala phrase.
+   */
   static isBasmala(line: string) {
     return ScreenplayClassifier.BASMALA_RE.test(line);
   }
 
+  /**
+   * Determines if a line marks the beginning of a scene header.
+   *
+   * @param {string} line - The candidate scene header line.
+   * @returns {boolean} True when the line matches Arabic scene header conventions.
+   */
   static isSceneHeaderStart(line: string) {
     return ScreenplayClassifier.SCENE_PREFIX_RE.test(line);
   }
 
+  /**
+   * Checks whether a line represents a screenplay transition cue.
+   *
+   * @param {string} line - The line to inspect for transition keywords.
+   * @returns {boolean} True if the line matches known transition phrases.
+   */
   static isTransition(line: string) {
     return ScreenplayClassifier.TRANSITION_RE.test(line);
   }
 
+  /**
+   * Evaluates if a line is formatted as a parenthetical aside.
+   *
+   * @param {string} line - The text that may contain parentheses.
+   * @returns {boolean} True when the line is enclosed in parentheses.
+   */
   static isParenShaped(line: string) {
     return ScreenplayClassifier.PARENTHETICAL_SHAPE_RE.test(line);
   }
 
+  /**
+   * Determines if a line should be classified as a character name heading.
+   *
+   * @param {string} line - The screenplay line under inspection.
+   * @param {any} context - State information about preceding lines in the block.
+   * @returns {boolean} True when heuristics identify the line as a character cue.
+   */
   static isCharacterLine(line: string, context: any) {
     if (ScreenplayClassifier.isSceneHeaderStart(line) || 
         ScreenplayClassifier.isTransition(line) || 
@@ -140,6 +219,12 @@ class ScreenplayClassifier {
     return ScreenplayClassifier.CHARACTER_RE.test(line) || arabicCharacterPattern.test(line);
   }
 
+  /**
+   * Predicts whether a line should be treated as an action description instead of dialogue.
+   *
+   * @param {string} line - The screenplay line being classified.
+   * @returns {boolean} True if the heuristics favor action classification.
+   */
   static isLikelyAction(line: string) {
     if (ScreenplayClassifier.isBlank(line) ||
         ScreenplayClassifier.isBasmala(line) ||
