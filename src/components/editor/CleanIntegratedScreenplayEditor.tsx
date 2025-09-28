@@ -16,6 +16,13 @@ import {
 } from 'lucide-react';
 import AdvancedAgentsPopup from './AdvancedAgentsPopup';
 import { applyRegexReplacementToTextNodes } from '../../modules/text/domTextReplacement';
+import type {
+  Script,
+  Scene,
+  Character,
+  DialogueLine,
+  SceneActionLine
+} from '../../types/types';
 
 // ==================== PRODUCTION-READY SYSTEM CLASSES ====================
 
@@ -394,7 +401,7 @@ class CollaborationSystem {
  * @class AIWritingAssistant
  * @description Provides AI-powered writing assistance.
  */
-class AIWritingAssistant {
+export class AIWritingAssistant {
   /**
    * @method generateText
    * @description Generates text based on a prompt and context.
@@ -630,7 +637,7 @@ class VisualPlanningSystem {
  * @class ScreenplayClassifier
  * @description A classifier for Arabic screenplays.
  */
-class ScreenplayClassifier {
+export class ScreenplayClassifier {
   /**
    * @method stripTashkeel
    * @description Strips Tashkeel from Arabic text.
@@ -857,15 +864,15 @@ class ScreenplayClassifier {
    * @returns {boolean} - True if the line is likely an action line, false otherwise.
    */
   static isLikelyAction(line: string): boolean {
-    if (ScreenplayClassifier.isBlank(line) || 
-        ScreenplayClassifier.isBasmala(line) || 
-        ScreenplayClassifier.isSceneHeaderStart(line) || 
-        ScreenplayClassifier.isTransition(line) || 
-        ScreenplayClassifier.isCharacterLine(line) || 
+    if (ScreenplayClassifier.isBlank(line) ||
+        ScreenplayClassifier.isBasmala(line) ||
+        ScreenplayClassifier.isSceneHeaderStart(line) ||
+        ScreenplayClassifier.isTransition(line) ||
+        ScreenplayClassifier.isCharacterLine(line) ||
         ScreenplayClassifier.isParenShaped(line)) {
       return false;
     }
-    
+
     // Additional checks for action lines
     const normalized = ScreenplayClassifier.normalizeLine(line);
     
@@ -903,8 +910,208 @@ class ScreenplayClassifier {
         }
       }
     }
-    
+
     return false;
+  }
+
+  /**
+   * Converts a raw screenplay text into a structured representation consisting of scenes, characters, and dialogue lines.
+   *
+   * @param {string} screenplayText - The raw screenplay content.
+   * @returns {Script} Structured screenplay data leveraging strongly typed models.
+   */
+  structureScript(screenplayText: string): Script {
+    const normalizedScript = screenplayText.replace(/\r\n/g, '\n');
+    const rawLines = normalizedScript.split('\n');
+
+    const scenes: Scene[] = [];
+    const characters: Record<string, Character> = {};
+    const dialogueLines: DialogueLine[] = [];
+
+    let currentScene: Scene | null = null;
+    let currentCharacterName: string | null = null;
+    let isInDialogueBlock = false;
+    let lastFormat: 'action' | 'dialogue' | 'character' | 'scene-header' | 'parenthetical' | 'transition' | 'blank' = 'action';
+    let sceneCounter = 0;
+
+    const createScene = (heading: string, lineNumber: number): Scene => {
+      sceneCounter += 1;
+      return {
+        id: `scene-${sceneCounter}`,
+        heading,
+        index: sceneCounter - 1,
+        startLineNumber: lineNumber,
+        lines: [],
+        dialogues: [],
+        actionLines: []
+      };
+    };
+
+    const resolveScene = (lineNumber: number): Scene => {
+      if (!currentScene) {
+        currentScene = createScene('مقدمة', lineNumber);
+        scenes.push(currentScene);
+      }
+      return currentScene;
+    };
+
+    const addActionLine = (scene: Scene, text: string, lineNumber: number) => {
+      const normalized = ScreenplayClassifier.normalizeLine(text) || text.trim();
+      if (!normalized) {
+        return;
+      }
+      const actionLine: SceneActionLine = { text: normalized, lineNumber };
+      scene.actionLines.push(actionLine);
+    };
+
+    const ensureCharacter = (name: string, sceneId: string): Character => {
+      if (!characters[name]) {
+        characters[name] = {
+          name,
+          dialogueCount: 0,
+          dialogueLines: [],
+          firstSceneId: sceneId
+        };
+      }
+
+      if (!characters[name].firstSceneId) {
+        characters[name].firstSceneId = sceneId;
+      }
+
+      return characters[name];
+    };
+
+    rawLines.forEach((rawLine, index) => {
+      const lineNumber = index + 1;
+
+      if (ScreenplayClassifier.isSceneHeaderStart(rawLine)) {
+        if (currentScene) {
+          currentScene.endLineNumber = lineNumber - 1;
+        }
+
+        const heading = ScreenplayClassifier.normalizeLine(rawLine) || rawLine.trim() || `مشهد ${sceneCounter + 1}`;
+        currentScene = createScene(heading, lineNumber);
+        currentScene.lines.push(rawLine);
+        scenes.push(currentScene);
+
+        currentCharacterName = null;
+        isInDialogueBlock = false;
+        lastFormat = 'scene-header';
+        return;
+      }
+
+      const activeScene = resolveScene(lineNumber);
+      activeScene.lines.push(rawLine);
+
+      if (ScreenplayClassifier.isBlank(rawLine)) {
+        currentCharacterName = null;
+        isInDialogueBlock = false;
+        lastFormat = 'blank';
+        return;
+      }
+
+      if (ScreenplayClassifier.isTransition(rawLine)) {
+        addActionLine(activeScene, rawLine, lineNumber);
+        currentCharacterName = null;
+        isInDialogueBlock = false;
+        lastFormat = 'transition';
+        return;
+      }
+
+      const context = { lastFormat, isInDialogueBlock };
+      if (ScreenplayClassifier.isCharacterLine(rawLine, context)) {
+        const normalizedCharacter = ScreenplayClassifier.normalizeLine(rawLine).replace(/:$/, '').trim();
+        currentCharacterName = normalizedCharacter || rawLine.trim();
+        ensureCharacter(currentCharacterName, activeScene.id);
+        isInDialogueBlock = true;
+        lastFormat = 'character';
+        return;
+      }
+
+      if (ScreenplayClassifier.isParenShaped(rawLine) && currentCharacterName) {
+        const parentheticalText = ScreenplayClassifier.textInsideParens(rawLine).trim() || ScreenplayClassifier.normalizeLine(rawLine);
+        if (parentheticalText) {
+          const dialogueEntry: DialogueLine = {
+            id: `dialogue-${dialogueLines.length + 1}`,
+            character: currentCharacterName,
+            text: parentheticalText,
+            lineNumber,
+            sceneId: activeScene.id,
+            type: 'parenthetical'
+          };
+          dialogueLines.push(dialogueEntry);
+          activeScene.dialogues.push(dialogueEntry);
+          const character = ensureCharacter(currentCharacterName, activeScene.id);
+          character.dialogueLines.push(dialogueEntry);
+          character.dialogueCount = character.dialogueLines.length;
+        }
+        isInDialogueBlock = true;
+        lastFormat = 'parenthetical';
+        return;
+      }
+
+      if (isInDialogueBlock && currentCharacterName) {
+        const dialogueText = ScreenplayClassifier.normalizeLine(rawLine) || rawLine.trim();
+        if (dialogueText) {
+          const dialogueEntry: DialogueLine = {
+            id: `dialogue-${dialogueLines.length + 1}`,
+            character: currentCharacterName,
+            text: dialogueText,
+            lineNumber,
+            sceneId: activeScene.id,
+            type: 'dialogue'
+          };
+          dialogueLines.push(dialogueEntry);
+          activeScene.dialogues.push(dialogueEntry);
+          const character = ensureCharacter(currentCharacterName, activeScene.id);
+          character.dialogueLines.push(dialogueEntry);
+          character.dialogueCount = character.dialogueLines.length;
+        }
+        lastFormat = 'dialogue';
+        return;
+      }
+
+      if (ScreenplayClassifier.isBasmala(rawLine) || ScreenplayClassifier.isLikelyAction(rawLine)) {
+        addActionLine(activeScene, rawLine, lineNumber);
+        currentCharacterName = null;
+        isInDialogueBlock = false;
+        lastFormat = 'action';
+        return;
+      }
+
+      // Fallback: treat uncategorised content as descriptive action to maintain continuity.
+      addActionLine(activeScene, rawLine, lineNumber);
+      currentCharacterName = null;
+      isInDialogueBlock = false;
+      lastFormat = 'action';
+    });
+
+    if (currentScene && !currentScene.endLineNumber) {
+      currentScene.endLineNumber = rawLines.length;
+    }
+
+    if (scenes.length === 0) {
+      scenes.push({
+        id: 'scene-1',
+        heading: 'مقدمة',
+        index: 0,
+        startLineNumber: 1,
+        endLineNumber: rawLines.length,
+        lines: rawLines,
+        dialogues: [],
+        actionLines: []
+      });
+    }
+
+    const script: Script = {
+      rawText: screenplayText,
+      totalLines: rawLines.length,
+      scenes,
+      characters,
+      dialogueLines
+    };
+
+    return script;
   }
 }
 

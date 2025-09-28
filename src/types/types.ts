@@ -131,3 +131,86 @@ export interface AIAgentConfig {
     outputSchema: any;
     confidenceThreshold: number;
 }
+
+/**
+ * Represents a single spoken or parenthetical line in the structured screenplay model.
+ */
+export interface DialogueLine {
+    /** Unique identifier generated for tracking the dialogue line. */
+    id: string;
+    /** Character name associated with the line. */
+    character: string;
+    /** Raw text content of the line. */
+    text: string;
+    /** One-based index of the line within the original script. */
+    lineNumber: number;
+    /** Identifier of the scene that contains this line. */
+    sceneId: string;
+    /**
+     * Type of dialogue line captured.
+     * `dialogue` denotes spoken text whereas `parenthetical` stores inline directions.
+     */
+    type: 'dialogue' | 'parenthetical';
+}
+
+/**
+ * Captures metadata for a screenplay character and their dialogue footprint.
+ */
+export interface Character {
+    /** Canonical character name. */
+    name: string;
+    /** Total number of dialogue lines attributed to the character. */
+    dialogueCount: number;
+    /** Detailed list of dialogue entries spoken by the character. */
+    dialogueLines: DialogueLine[];
+    /** Identifier of the first scene where the character appears. */
+    firstSceneId?: string;
+}
+
+/**
+ * Stores action lines within a scene with their original ordering preserved.
+ */
+export interface SceneActionLine {
+    /** Original text for the action or description line. */
+    text: string;
+    /** One-based index within the screenplay. */
+    lineNumber: number;
+}
+
+/**
+ * Represents a structured screenplay scene extracted from free-form text.
+ */
+export interface Scene {
+    /** Stable identifier for the scene. */
+    id: string;
+    /** Normalized heading text (e.g. "مشهد 1"). */
+    heading: string;
+    /** Zero-based scene position within the screenplay. */
+    index: number;
+    /** One-based line number where the scene begins. */
+    startLineNumber: number;
+    /** One-based line number where the scene ends. */
+    endLineNumber?: number;
+    /** Ordered list of raw lines included in the scene. */
+    lines: string[];
+    /** Spoken and parenthetical dialogue entries contained in the scene. */
+    dialogues: DialogueLine[];
+    /** Descriptive or action-oriented lines associated with the scene. */
+    actionLines: SceneActionLine[];
+}
+
+/**
+ * Root data model describing a structured screenplay document.
+ */
+export interface Script {
+    /** Original screenplay text provided by the user. */
+    rawText: string;
+    /** Total number of lines in the screenplay. */
+    totalLines: number;
+    /** Ordered collection of structured scenes. */
+    scenes: Scene[];
+    /** Aggregated character information keyed by character name. */
+    characters: Record<string, Character>;
+    /** Flat list of all dialogue lines for quick inspection. */
+    dialogueLines: DialogueLine[];
+}
