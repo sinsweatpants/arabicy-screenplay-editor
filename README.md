@@ -24,6 +24,10 @@ A Vite + React + TypeScript application that delivers a production-ready writing
 - **AI assistance suite** – Modular agents that analyze rhythm, characters, tension, producibility, and more, plus creative generators and completion utilities.
 - **Visual planning support** – Storyboard and beat sheet abstractions for connecting prose with cinematic planning artifacts.
 
+
+
+
+
 ## Architecture Overview
 
 | Layer | Description |
