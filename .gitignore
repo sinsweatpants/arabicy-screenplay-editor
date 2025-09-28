@@ -22,3 +22,32 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+
+# Windows file system permission files
+ehthumbs.db
+ehthumbs_vista.db
+
+# Folders with persisted state
+blob_storage
+indexeddb
+localstorage
+shader_cache
+tmp
+
+# Folder with profiler-related files
+profiler_results
+
+# Mocha test results
+*.mocha.opts
+*.mocha-result.json
+
+# Playwright test results
+playwright-report
+
+# Environment variables
+.env
+.env.local
