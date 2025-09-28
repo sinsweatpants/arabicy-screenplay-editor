@@ -57,6 +57,7 @@ class StateManager {
    * @description Sets the state for a given key.
    * @param {string} key - The key to set.
    * @param {any} value - The value to set.
+   * @returns {void} Executes all subscriber callbacks with the updated value.
    */
   setState(key: string, value: any) {
     this.state.set(key, value);
@@ -104,6 +105,7 @@ class AutoSaveManager {
    * @method setSaveCallback
    * @description Sets the save callback.
    * @param {(content: string) => Promise<void>} callback - The callback to execute when saving.
+   * @returns {void} Stores the provided callback for subsequent save operations.
    */
   setSaveCallback(callback: (content: string) => Promise<void>) {
     this.saveCallback = callback;
@@ -113,6 +115,7 @@ class AutoSaveManager {
    * @method updateContent
    * @description Updates the current content.
    * @param {string} content - The new content.
+   * @returns {void} Caches the latest editor snapshot for future saves.
    */
   updateContent(content: string) {
     this.currentContent = content;
@@ -121,6 +124,7 @@ class AutoSaveManager {
   /**
    * @method startAutoSave
    * @description Starts the auto-save interval.
+   * @returns {void} Begins polling for changes at the configured interval.
    */
   startAutoSave() {
     if (this.autoSaveInterval) return;
@@ -141,6 +145,7 @@ class AutoSaveManager {
   /**
    * @method stopAutoSave
    * @description Stops the auto-save interval.
+   * @returns {void} Clears any scheduled auto-save timers.
    */
   stopAutoSave() {
     if (this.autoSaveInterval) {
@@ -152,6 +157,7 @@ class AutoSaveManager {
   /**
    * @method forceSave
    * @description Forces a save.
+   * @returns {Promise<void>} Resolves once the latest content snapshot is persisted.
    */
   async forceSave() {
     if (this.saveCallback) {
@@ -302,6 +308,7 @@ class CollaborationSystem {
    * @method addCollaborator
    * @description Adds a collaborator.
    * @param {{ id: string; name: string; color: string }} collaborator - The collaborator to add.
+   * @returns {void} Registers the collaborator and notifies subscribers of the change.
    */
   addCollaborator(collaborator: { id: string; name: string; color: string }) {
     this.collaborators.push(collaborator);
@@ -312,6 +319,7 @@ class CollaborationSystem {
    * @method removeCollaborator
    * @description Removes a collaborator.
    * @param {string} id - The ID of the collaborator to remove.
+   * @returns {void} Removes the collaborator and broadcasts the update.
    */
   removeCollaborator(id: string) {
     this.collaborators = this.collaborators.filter(c => c.id !== id);
@@ -322,6 +330,7 @@ class CollaborationSystem {
    * @method addComment
    * @description Adds a comment.
    * @param {{ id: string; content: string; author: string; timestamp: Date; position: any }} comment - The comment to add.
+   * @returns {void} Stores the comment and dispatches a change event.
    */
   addComment(comment: { id: string; content: string; author: string; timestamp: Date; position: any }) {
     this.comments.push(comment);
@@ -332,6 +341,7 @@ class CollaborationSystem {
    * @method removeComment
    * @description Removes a comment.
    * @param {string} id - The ID of the comment to remove.
+   * @returns {void} Deletes the comment and alerts all subscribers.
    */
   removeComment(id: string) {
     this.comments = this.comments.filter(c => c.id !== id);
@@ -342,6 +352,7 @@ class CollaborationSystem {
    * @method subscribeToChanges
    * @description Subscribes to changes.
    * @param {(data: any) => void} callback - The callback to execute on change.
+   * @returns {void} Registers the callback for subsequent change notifications.
    */
   subscribeToChanges(callback: (data: any) => void) {
     this.changeCallbacks.push(callback);
@@ -498,6 +509,7 @@ class ProjectManager {
    * @method deleteProject
    * @description Deletes a project.
    * @param {string} id - The ID of the project to delete.
+   * @returns {void} Removes the project from the internal collection.
    */
   deleteProject(id: string) {
     this.projects = this.projects.filter(p => p.id !== id);
@@ -894,6 +906,11 @@ class ScreenplayClassifier {
 
 // ==================== MAIN SCREENPLAY EDITOR COMPONENT ====================
 
+/**
+ * Provides the main integrated screenplay editing experience with formatting, tooling, and AI helpers.
+ *
+ * @returns {JSX.Element} The fully interactive screenplay editor layout.
+ */
 const CleanIntegratedScreenplayEditor: React.FC = () => {
   // State variables
   const [htmlContent, setHtmlContent] = useState('');
@@ -946,7 +963,12 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
   const visualPlanning = useRef(new VisualPlanningSystem());
   const screenplayClassifier = useRef(new ScreenplayClassifier());
 
-  // Get format styles
+  /**
+   * Computes inline styles for a screenplay block based on the semantic format type.
+   *
+   * @param {string} formatType - The semantic style key (e.g., action, dialogue, transition).
+   * @returns {React.CSSProperties} A merged style object ready for inline application.
+   */
   const getFormatStyles = (formatType: string): React.CSSProperties => {
     const baseStyles: React.CSSProperties = {
       fontFamily: `${selectedFont}, Amiri, Cairo, Noto Sans Arabic, Arial, sans-serif`,
@@ -975,12 +997,20 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     return finalStyles;
   };
 
-  // Update cursor position
+  /**
+   * Placeholder for future cursor tracking logic that keeps tool state in sync with caret position.
+   *
+   * @returns {void} Currently performs no action but preserves extensibility hooks.
+   */
   const updateCursorPosition = () => {
     // Function implementation removed as variables are unused
   };
 
-  // Check if current element is empty
+  /**
+   * Determines whether the node containing the current caret position has any textual content.
+   *
+   * @returns {boolean} True when the focused element is empty; otherwise false.
+   */
   const isCurrentElementEmpty = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
@@ -991,7 +1021,11 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     return false;
   };
 
-  // Calculate document stats
+  /**
+   * Calculates aggregate document statistics and updates the sidebar dashboard.
+   *
+   * @returns {void} Synchronizes character, word, page, and scene counts with UI state.
+   */
   const calculateStats = () => {
     if (editorRef.current) {
       const textContent = editorRef.current.innerText || '';
@@ -1007,7 +1041,13 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Get next format on Tab
+  /**
+   * Determines the next screenplay block format when the Tab key navigation is used.
+   *
+   * @param {string} currentFormat - The format applied to the current line.
+   * @param {boolean} shiftKey - Indicates whether the Shift key is held to reverse navigation.
+   * @returns {string} The next format identifier to apply.
+   */
   const getNextFormatOnTab = (currentFormat: string, shiftKey: boolean) => {
     const mainSequence = ['scene-header-top-line', 'action', 'character', 'transition'];
     
@@ -1039,7 +1079,12 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Get next format on Enter
+  /**
+   * Resolves the subsequent format that should be applied after pressing Enter.
+   *
+   * @param {string} currentFormat - The format assigned to the current line.
+   * @returns {string} The format key for the newly inserted line.
+   */
   const getNextFormatOnEnter = (currentFormat: string) => {
     const transitions: { [key: string]: string } = {
       'scene-header-top-line': 'scene-header-3', 
@@ -1051,7 +1096,12 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     return transitions[currentFormat] || 'action';
   };
 
-  // Apply format to current line
+  /**
+   * Applies a semantic screenplay class to the block that currently contains the caret.
+   *
+   * @param {string} formatType - The screenplay format class to assign.
+   * @returns {void} Updates the DOM element class and synchronizes internal state.
+   */
   const applyFormatToCurrentLine = (formatType: string) => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
@@ -1066,12 +1116,22 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Format text
+  /**
+   * Executes document editing commands such as bold or italic on the current selection.
+   *
+   * @param {string} command - The document.execCommand instruction to run.
+   * @param {string} [value=''] - Optional value payload for the command.
+   * @returns {void} Mutates the DOM selection with the requested formatting.
+   */
   const formatText = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
   };
 
-  // Update content
+  /**
+   * Synchronizes the editor HTML with component state and triggers dependent calculations.
+   *
+   * @returns {void} Persists the latest HTML snapshot and recalculates document metrics.
+   */
   const updateContent = () => {
     if (editorRef.current) {
       setHtmlContent(editorRef.current.innerHTML);
@@ -1089,7 +1149,12 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Handle key down
+  /**
+   * Intercepts keyboard shortcuts to provide screenplay-aware formatting behavior.
+   *
+   * @param {React.KeyboardEvent} e - The keyboard event triggered by the user.
+   * @returns {void} Prevents default behaviors and applies screenplay-aware formatting transitions.
+   */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -1123,19 +1188,32 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     setTimeout(updateContent, 10);
   };
 
-  // Handle paste
+  /**
+   * Normalizes pasted content to plain text to preserve screenplay formatting integrity.
+   *
+   * @param {React.ClipboardEvent} e - The clipboard event fired when content is pasted.
+   * @returns {void} Inserts sanitized text into the editor surface.
+   */
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
     document.execCommand('insertText', false, text);
   };
 
-  // Handle content change
+  /**
+   * Responds to editor mutations triggered by input events.
+   *
+   * @returns {void} Synchronizes component state with the latest editor markup.
+   */
   const handleContentChange = () => {
     updateContent();
   };
 
-  // Handle search
+  /**
+   * Executes a search across the editor content using the advanced search engine helper.
+   *
+   * @returns {Promise<void>} Resolves after presenting the search results to the user.
+   */
   const handleSearch = async () => {
     if (!searchTerm.trim() || !editorRef.current) return;
     
@@ -1149,7 +1227,11 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Handle replace
+  /**
+   * Performs find-and-replace operations across the screenplay content.
+   *
+   * @returns {Promise<void>} Resolves after replacing matching instances and updating the editor.
+   */
   const handleReplace = async () => {
     if (!searchTerm.trim() || !editorRef.current) return;
     
@@ -1167,7 +1249,11 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Handle character rename
+  /**
+   * Renames a character by replacing matching uppercase headings throughout the document.
+   *
+   * @returns {void} Applies the rename and closes the rename dialog when complete.
+   */
   const handleCharacterRename = () => {
     if (!oldCharacterName.trim() || !newCharacterName.trim() || !editorRef.current) return;
     
@@ -1185,7 +1271,11 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
     }
   };
 
-  // Handle AI review
+  /**
+   * Simulates an AI-powered review of the screenplay content and surfaces the findings.
+   *
+   * @returns {Promise<void>} Resolves after generating and displaying the mock review output.
+   */
   const handleAIReview = async () => {
     if (!editorRef.current) return;
     
@@ -1221,7 +1311,11 @@ Suggestions:
     }
   };
 
-  // Toggle dark mode
+  /**
+   * Switches between light and dark themes for the editor workspace.
+   *
+   * @returns {void} Flips the dark-mode state flag.
+   */
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };

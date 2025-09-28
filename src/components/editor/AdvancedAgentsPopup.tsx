@@ -105,7 +105,7 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
    * @function runAgentAnalysis
    * @description Runs the analysis for a given agent.
    * @param {Agent} agent - The agent to run the analysis with.
-   * @returns {Promise<void>}
+   * @returns {Promise<void>} Resolves once the simulated analysis workflow is complete.
    */
   const runAgentAnalysis = async (agent: Agent) => {
     setSelectedAgent(agent);
@@ -194,7 +194,7 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
    * @function getCategoryIcon
    * @description Gets the icon for a given category.
    * @param {string} category - The category to get the icon for.
-   * @returns {JSX.Element} - The icon component.
+   * @returns {JSX.Element} The icon component that visually represents the category.
    */
   const getCategoryIcon = (category: string) => {
     switch(category) {
@@ -211,7 +211,7 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
    * @function getCategoryColor
    * @description Gets the color for a given category.
    * @param {string} category - The category to get the color for.
-   * @returns {string} - The color class.
+   * @returns {string} The Tailwind color utility classes tied to the category palette.
    */
   const getCategoryColor = (category: string) => {
     switch(category) {

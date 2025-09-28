@@ -1,122 +1,130 @@
 # Arabic Screenplay Editor
 
-An advanced, feature-rich editor for writing, analyzing, and formatting Arabic screenplays. This tool provides proper formatting for scene headers, character names, dialogue, and action lines, along with a suite of AI-powered agents to enhance the writing process.
+A Vite + React + TypeScript application that delivers a production-ready writing environment tailored for Arabic screenwriters. The editor combines precise right-to-left formatting, a customizable drafting surface, and an ecosystem of AI-powered agents that assist with analysis, ideation, and polishing.
 
 ## Table of Contents
 
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Running the Application](#running-the-application)
-- [Usage](#usage)
-  - [Basic Editing](#basic-editing)
-  - [Advanced Agents](#advanced-agents)
-- [Contributing](#contributing)
-- [License](#license)
+1. [Key Features](#key-features)
+2. [Architecture Overview](#architecture-overview)
+3. [Getting Started](#getting-started)
+4. [Development Scripts](#development-scripts)
+5. [Environment Configuration](#environment-configuration)
+6. [Using the Editor](#using-the-editor)
+7. [AI Agent Platform](#ai-agent-platform)
+8. [Project Structure](#project-structure)
+9. [Contributing](#contributing)
+10. [License](#license)
 
-## Features
+## Key Features
 
-- **Standard Screenplay Formatting**: Automatically formats your text into standard screenplay elements:
-  - **Scene Headers**: e.g., "مشهد 1 – ليل-داخلي"
-  - **Character Names**: Centered and bold.
-  - **Dialogue**: Centered below the character name.
-  - **Action Lines**: Right-aligned descriptive text.
-  - **Parentheticals**: Italicized and centered.
-  - **Transitions**: e.g., "قطع إلى"
-- **Right-to-Left (RTL) Support**: Full support for Arabic text and layout.
-- **Enhanced Pattern Recognition**: Sophisticated algorithms to correctly identify screenplay elements even in complex structures.
-- **AI-Powered Writing Assistants**: A suite of intelligent agents to help you analyze and improve your screenplay:
-  - **Analysis Agents**: Provide deep insights into character networks, dialogue forensics, thematic mining, and more.
-  - **Creative Agents**: Generate scene ideas, enhance character voices, and help with world-building.
-  - **Predictive & Optimization Agents**: Predict plot points, optimize tension, and analyze audience resonance.
-- **Dark & Light Mode**: Switch between themes for your comfort.
-- **Export & Print**: Save your work or print it directly from the editor.
+- **Arabic-first screenplay formatting** – Automatic styling for basmala, scene headers, action, dialogue, transitions, and parentheticals with precise RTL layout.
+- **Productivity tooling** – Keyboard navigation between formats, rich text styling, search and replace, character renaming, statistics, and light/dark mode toggles.
+- **Auto-save orchestration** – A dedicated manager that safely persists work and supports future integrations with remote storage.
+- **Advanced search engine** – Regex-aware search/replace with whole-word and case-sensitivity options tuned for Arabic scripts.
+- **AI assistance suite** – Modular agents that analyze rhythm, characters, tension, producibility, and more, plus creative generators and completion utilities.
+- **Visual planning support** – Storyboard and beat sheet abstractions for connecting prose with cinematic planning artifacts.
 
-## Project Structure
+## Architecture Overview
 
-The project is a standard Vite + React + TypeScript application. Here's a brief overview of the key directories:
-
-```
-/
-├── public/           # Static assets
-├── src/
-│   ├── agents/       # AI agent configurations and logic
-│   ├── assets/       # Images, fonts, etc.
-│   ├── components/   # React components
-│   │   └── editor/   # Editor-specific components
-│   ├── config/       # Application-wide configurations (e.g., agent list)
-│   ├── services/     # Helper functions and services
-│   ├── types/        # TypeScript type definitions
-│   ├── App.tsx       # Main application component
-│   └── main.tsx      # Application entry point
-├── package.json      # Project dependencies and scripts
-└── vite.config.ts    # Vite configuration
-```
+| Layer | Description |
+| --- | --- |
+| **UI Components** | React components under `src/components/` implement the editor shell, modal dialogs, and UX tooling. |
+| **State & Services** | `StateManager`, `AutoSaveManager`, `CollaborationSystem`, and other classes inside `CleanIntegratedScreenplayEditor.tsx` encapsulate local domain logic. |
+| **AI Agents** | Configuration-heavy modules in `src/agents/` define task-specific personas and prompts that are orchestrated through Gemini (`geminiService.ts`). |
+| **Types & Config** | Shared enums and interfaces in `src/types/` plus centralized agent registries in `src/config/`. |
+| **Assets & Styling** | Tailwind-powered styling pipeline with additional editor-specific CSS in `src/style.css`. |
 
 ## Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine.
+1. **Install prerequisites**
+   - [Node.js 18+](https://nodejs.org/) (which ships with npm)
 
-### Prerequisites
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-You need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed on your system.
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+   By default Vite serves the app at [http://localhost:5173](http://localhost:5173). The terminal will display the exact URL.
 
-### Installation
+4. **Build for production**
+   ```bash
+   npm run build
+   ```
+   The optimized bundle is emitted to `dist/` and can be previewed with `npm run preview`.
 
-1.  Clone the repository:
-    ```bash
-    git clone <repository-url>
-    ```
-2.  Navigate to the project directory:
-    ```bash
-    cd arabic-screenplay-editor
-    ```
-3.  Install the dependencies:
-    ```bash
-    npm install
-    ```
+## Development Scripts
 
-### Running the Application
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Launches the hot-reloading development server. |
+| `npm run build` | Type-checks the project and generates an optimized production build. |
+| `npm run preview` | Serves the production bundle locally for smoke testing. |
 
-To start the development server, run:
+> **Testing & Linting**: The repository currently does not ship automated tests or lint scripts. When adding them, prefer `vitest` for unit tests and `eslint` + `prettier` for consistent authoring.
 
-```bash
-npm run dev
+## Environment Configuration
+
+Some AI functionality requires a Gemini API key at runtime:
+
+- Create a `.env.local` file at the project root.
+- Add `API_KEY=<your_google_generative_ai_key>`.
+- Restart the dev server after updating environment variables.
+
+The application gracefully degrades when a key is absent; AI features will surface informative error messages.
+
+## Using the Editor
+
+1. **Drafting Basics**
+   - Type directly into the central editing surface. Formatting updates automatically based on detected screenplay cues.
+   - Use **Tab** / **Shift+Tab** to cycle between action, character, dialogue, and transition blocks.
+   - Apply rich text commands with familiar shortcuts (`Ctrl+B`, `Ctrl+I`, `Ctrl+U`).
+
+2. **Toolbars & Panels**
+   - **Top toolbar** exposes file, edit, format, and tools menus along with theme toggles.
+   - **Right sidebar** controls fonts, sizes, quick insert shortcuts, document statistics, search/replace dialogs, and AI helpers.
+
+3. **Search & Replace**
+   - Invoke search via the binoculars icon or shortcuts, then apply regex-enabled queries to locate dialogue or action lines.
+
+4. **Character Management**
+   - Rename characters globally from the sidebar dialog to maintain naming consistency across long drafts.
+
+5. **AI Review**
+   - Open the AI review panel to trigger an automated critique. The current implementation simulates responses; integrating the real Gemini backend requires a valid API key.
+
+## AI Agent Platform
+
+- Agent blueprints live in `src/agents/` and are grouped by category (core, analysis, generation, evaluation, transformation).
+- The Gemini service (`src/agents/core/geminiService.ts`) assembles persona prompts, attaches uploaded documents, and calls the Google Generative AI SDK.
+- Customize agent behaviour by editing the corresponding instruction files under `src/agents/instructions/`.
+
+## Project Structure
+
 ```
-
-The application will be available at `http://localhost:5173` (the port may vary).
-
-## Usage
-
-### Basic Editing
-
-1.  Open the editor in your browser.
-2.  Start typing or paste your Arabic screenplay text into the editor.
-3.  The editor will automatically format the text as you type based on standard screenplay conventions.
-4.  Use the toolbar to apply formatting, search, replace, and access other tools.
-5.  Use the sidebar to change fonts, see document statistics, and use quick-add buttons.
-
-### Advanced Agents
-
-1.  Click on **أدوات (Tools)** in the header menu.
-2.  Select **الوكلاء المتقدمة (Advanced Agents)**.
-3.  In the popup, you can browse available agents for analysis, creative generation, and more.
-4.  Select an agent and click **تشغيل التحليل (Run Analysis)**.
-5.  The results will appear in the "نتائج التحليل (Analysis Results)" tab.
+src/
+├── agents/            # Agent configs, instructions, and Gemini integration helpers
+├── assets/            # Static assets consumed by the UI
+├── components/        # React components (editor shell and popups)
+│   └── editor/        # Screenplay editor and related dialogs
+├── config/            # Shared configuration maps for agents and UI
+├── services/          # Standalone utilities (e.g., classifier experiments)
+├── tests/             # Placeholder for future automated tests
+├── types/             # Shared TypeScript enums and interfaces
+├── App.tsx            # Root component mounting the editor
+└── main.tsx           # Vite entry point
+```
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions for improvements or want to add new features, please follow these steps:
-
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Make your changes.
-4.  Commit your changes (`git commit -m 'Add some feature'`).
-5.  Push to the branch (`git push origin feature/your-feature-name`).
-6.  Open a Pull Request.
+1. Fork the repository and create a topic branch (`git checkout -b feature/amazing-improvement`).
+2. Implement your changes and include documentation or tests where appropriate.
+3. Run `npm run build` to ensure the project type-checks and bundles successfully.
+4. Open a pull request that describes the motivation, solution, and validation steps.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is provided under the MIT License. See the [LICENSE](LICENSE) file for full terms.
