@@ -15,6 +15,7 @@ import {
   Brain
 } from 'lucide-react';
 import AdvancedAgentsPopup from './AdvancedAgentsPopup';
+import { applyRegexReplacementToTextNodes } from './textReplacement';
 
 // ==================== PRODUCTION-READY SYSTEM CLASSES ====================
 
@@ -275,7 +276,10 @@ class AdvancedSearchEngine {
         newContent: newContent,
         replacements: originalMatches.length,
         searchQuery: searchQuery,
-        replaceText: replaceText
+        replaceText: replaceText,
+        patternSource: searchPattern.source,
+        patternFlags: searchPattern.flags,
+        replaceAll: replaceAll
       };
 
     } catch (error) {
@@ -1234,16 +1238,24 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
    */
   const handleReplace = async () => {
     if (!searchTerm.trim() || !editorRef.current) return;
-    
+
     const content = editorRef.current.innerText;
     const result = await searchEngine.current.replaceInContent(content, searchTerm, replaceTerm);
-    
-    if (result.success) {
-      if (editorRef.current) {
-        editorRef.current.innerText = result.newContent;
+
+    if (result.success && editorRef.current) {
+      const replacementsApplied = applyRegexReplacementToTextNodes(
+        editorRef.current,
+        result.patternSource as string,
+        result.patternFlags as string,
+        result.replaceText as string,
+        result.replaceAll !== false
+      );
+
+      if (replacementsApplied > 0) {
         updateContent();
-        alert(`Replaced ${result.replacements} occurrences of "${searchTerm}" with "${replaceTerm}"`);
       }
+
+      alert(`Replaced ${replacementsApplied} occurrences of "${searchTerm}" with "${replaceTerm}"`);
     } else {
       alert(`Replace failed: ${result.error}`);
     }
@@ -1257,17 +1269,26 @@ const CleanIntegratedScreenplayEditor: React.FC = () => {
   const handleCharacterRename = () => {
     if (!oldCharacterName.trim() || !newCharacterName.trim() || !editorRef.current) return;
     
-    const content = editorRef.current.innerText;
     const regex = new RegExp(`^\\s*${oldCharacterName}\\s*$`, 'gmi');
-    const newContent = content.replace(regex, newCharacterName.toUpperCase());
-    
+
     if (editorRef.current) {
-      editorRef.current.innerText = newContent;
-      updateContent();
-      alert(`Renamed character "${oldCharacterName}" to "${newCharacterName}"`);
-      setShowCharacterRename(false);
-      setOldCharacterName('');
-      setNewCharacterName('');
+      const replacementsApplied = applyRegexReplacementToTextNodes(
+        editorRef.current,
+        regex.source,
+        regex.flags,
+        newCharacterName.toUpperCase(),
+        true
+      );
+
+      if (replacementsApplied > 0) {
+        updateContent();
+        alert(`Renamed character "${oldCharacterName}" to "${newCharacterName}" (${replacementsApplied})`);
+        setShowCharacterRename(false);
+        setOldCharacterName('');
+        setNewCharacterName('');
+      } else {
+        alert(`لم يتم العثور على الشخصية "${oldCharacterName}" لإعادة تسميتها.`);
+      }
     }
   };
 
