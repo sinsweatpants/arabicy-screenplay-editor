@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && node --experimental-specifier-resolution=node --test dist-test/tests/replace-helper.test.js"
+    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && node --experimental-specifier-resolution=node --test dist-test/tests"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
