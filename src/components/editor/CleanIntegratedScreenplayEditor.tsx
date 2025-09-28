@@ -15,7 +15,7 @@ import {
   Brain
 } from 'lucide-react';
 import AdvancedAgentsPopup from './AdvancedAgentsPopup';
-import { applyRegexReplacementToTextNodes } from './textReplacement';
+import { applyRegexReplacementToTextNodes } from '../../modules/text/domTextReplacement';
 
 // ==================== PRODUCTION-READY SYSTEM CLASSES ====================
 
