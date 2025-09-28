@@ -1081,7 +1081,7 @@ export class ScreenplayClassifier {
     });
 
     if (currentScene) {
-      currentScene.endLineNumber = rawLines.length;
+      (currentScene as Scene).endLineNumber = rawLines.length;
     }
 
     if (scenes.length === 0) {

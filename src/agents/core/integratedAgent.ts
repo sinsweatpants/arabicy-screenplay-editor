@@ -11,11 +11,11 @@ export class IntegratedAgent {
 
   constructor(agentConfig: AIAgentConfig, apiKey: string) {
     this.agentConfig = agentConfig;
-    this.config = agentsConfig[agentConfig.id] || agentsConfig.default;
+    this.config = agentsConfig[agentConfig.id || 'default'] || agentsConfig.default;
     this.geminiService = new GeminiService(apiKey, this.config);
   }
 
-  public async execute(prompt: string): Promise<any> {
+  public async execute(...args: any[]): Promise<any> {
     // This is a base method that should be overridden by subclasses
     throw new Error("Method 'execute()' must be implemented.");
   }

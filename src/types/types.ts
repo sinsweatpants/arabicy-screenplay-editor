@@ -127,6 +127,9 @@ export interface AIAgentConfig {
     taskType?: TaskType;
     instructions?: string;
     capabilities?: string[] | Record<string, boolean | string | number>;
+    collaboratesWith?: TaskType[];
+    dependsOn?: TaskType[];
+    enhances?: TaskType[];
     modelConfig?: {
         temperature?: number;
         maxTokens?: number;
@@ -141,6 +144,13 @@ export interface AIAgentConfig {
     qualityGates?: string[];
     fallbackBehavior?: string;
     confidenceThreshold?: number;
+    fewShotExamples?: any[];
+    chainOfThoughtTemplate?: string;
+    cacheStrategy?: string;
+    parallelizable?: boolean;
+    batchProcessing?: boolean;
+    validationRules?: string[];
+    outputSchema?: any;
 }
 
 /**

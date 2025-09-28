@@ -36,9 +36,14 @@ beforeAll(() => {
 
   // Mock IntersectionObserver
   global.IntersectionObserver = class IntersectionObserver {
+    root = null;
+    rootMargin = '';
+    thresholds = [0];
+
     constructor() {}
     observe() {}
     unobserve() {}
     disconnect() {}
-  }
+    takeRecords(): IntersectionObserverEntry[] { return []; }
+  } as any;
 })

@@ -1,7 +1,8 @@
 import { IntegratedAgent } from '../core/integratedAgent';
-import { AIAgentConfig, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
+import { TaskType } from '../../types/types';
 import { CHARACTER_DEEP_ANALYZER_AGENT_CONFIG } from './characterDeepAnalyzerConfig';
-import { ProcessedFile } from '../core/fileReaderService';
+import type { ProcessedFile } from '../core/fileReaderService';
 
 export class CharacterDeepAnalyzerAgent extends IntegratedAgent {
   constructor(apiKey: string) {
