@@ -1,15 +1,16 @@
-import { GoogleGenerativeAI, GenerateContentResponse, Part, Content, SafetySetting, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import type { GenerateContentResponse, Part, Content, SafetySetting } from "@google/generative-ai";
+import { environment } from '../../config';
 import { TaskCategory, TaskType } from '../../types/types';
 import {
-  GEMINI_TEXT_MODEL,
   PROMPT_PERSONA_BASE,
   TASK_SPECIFIC_INSTRUCTIONS,
   TASKS_EXPECTING_JSON_RESPONSE,
   COMPLETION_ENHANCEMENT_OPTIONS,
   TASK_CATEGORY_MAP
-} from '../../constants';
+} from '../../config';
 import { ENHANCED_TASK_DESCRIPTIONS as TASK_DESCRIPTIONS_FOR_PROMPT } from '../instructions/prompts';
-import { ProcessedFile } from './fileReaderService';
+import type { ProcessedFile } from './fileReaderService';
 
 /**
  * @interface ProcessTextsParams
@@ -51,23 +52,7 @@ export interface GeminiServiceResponse {
   error?: string;
 }
 
-let ai: GoogleGenerativeAI | null = null;
-
-/**
- * @function getAiInstance
- * @description Initializes and returns a singleton instance of the GoogleGenerativeAI client.
- * @throws {Error} If the API_KEY environment variable is not set.
- * @returns {GoogleGenerativeAI} The singleton instance of the GoogleGenerativeAI client.
- */
-const getAiInstance = (): GoogleGenerativeAI => {
-  if (!ai) {
-    if (!process.env.API_KEY) {
-      throw new Error("لم يتم تعيين متغير البيئة API_KEY.");
-    }
-    ai = new GoogleGenerativeAI(process.env.API_KEY);
-  }
-  return ai;
-};
+import type { AgentConfig } from "../../config";
 
 /**
  * @function attemptToFixJson
@@ -77,19 +62,19 @@ const getAiInstance = (): GoogleGenerativeAI => {
  */
 const attemptToFixJson = (jsonString: string): string => {
     const objectMatch = jsonString.match(/\{(?:.|\n)*\}/s);
-    if (objectMatch && objectMatch[0]) {
+    if (objectMatch && objectMatch) {
         try {
-            JSON.parse(objectMatch[0]);
-            return objectMatch[0];
+            JSON.parse(objectMatch);
+            return objectMatch;
         } catch (e) {
             // console.warn("attemptToFixJson: Extracted object substring is not valid JSON.", e);
         }
     }
     const arrayMatch = jsonString.match(/\[(?:.|\n)*\]/s);
-    if (arrayMatch && arrayMatch[0]) {
+    if (arrayMatch && arrayMatch) {
         try {
-            JSON.parse(arrayMatch[0]);
-            return arrayMatch[0];
+            JSON.parse(arrayMatch);
+            return arrayMatch;
         } catch (e) {
             // console.warn("attemptToFixJson: Extracted array substring is not valid JSON.", e);
         }
@@ -116,9 +101,9 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
   const parts: Part[] = [];
 
   let taskSpecificRole = "";
-  const taskDescription = TASK_DESCRIPTIONS_FOR_PROMPT[taskType] || "مهمة عامة";
+  const taskDescription = (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType] || "مهمة عامة";
   const category = TASK_CATEGORY_MAP[taskType];
-  const taskLabel = taskDescription.split(':')[0].trim();
+  const taskLabel = taskDescription.split(':').trim();
 
   switch(category) {
     case TaskCategory.CORE:
@@ -128,17 +113,17 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
         taskSpecificRole = `بصفتك خبير تحليل درامي ونقدي، متخصص في "${taskLabel}".`;
       }
       break;
-    case TaskCategory.ANALYSIS:
+    case TaskCategory.ANALYSES:
         taskSpecificRole = `بصفتك خبير تحليل درامي متخصص في "${taskLabel}".`;
       break;
-    case TaskCategory.CREATIVE:
+    case 'creative':
       taskSpecificRole = `بصفتك كاتب سيناريو ومؤلف مبدع متخصص في "${taskLabel}".`;
       break;
-    case TaskCategory.PREDICTIVE:
+    case 'predictive':
       taskSpecificRole = `بصفتك مستشرف وخبير استراتيجي في تطوير الدراما متخصص في "${taskLabel}".`;
       break;
-    case TaskCategory.ADVANCED_MODULES:
-      const moduleNameOnly = TASK_DESCRIPTIONS_FOR_PROMPT[taskType] ? TASK_DESCRIPTIONS_FOR_PROMPT[taskType].substring(TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf(':') + 1, TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf('-') !==-1 ? TASK_DESCRIPTIONS_FOR_PROMPT[taskType].indexOf('-') : TASK_DESCRIPTIONS_FOR_PROMPT[taskType].length).trim() : taskLabel;
+    case 'advanced_modules':
+      const moduleNameOnly = (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType] ? (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType].substring((TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType].indexOf(':') + 1, (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType].indexOf('-') !==-1 ? (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType].indexOf('-') : (TASK_DESCRIPTIONS_FOR_PROMPT as any)[taskType].length).trim() : taskLabel;
       taskSpecificRole = `بصفتك خبير متخصص في "${moduleNameOnly}", قادر على إجراء تحليلات معمقة وتقديم نتائج منظمة بناءً على المكونات المحددة للوحدة.`;
       break;
     default:
@@ -227,8 +212,8 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
 
       let goalSummary = enhancementDetail?.label || enhancementId;
       const goalMatch = enhancementInstructions.match(/\*\*الهدف:\*\*\s*([^\r\n]+)/);
-      if (goalMatch && goalMatch[1]) {
-        goalSummary = goalMatch[1];
+      if (goalMatch && goalMatch) {
+        goalSummary = goalMatch;
       }
 
       userRequirementsSection += `- **${enhancementDetail?.label || enhancementId}:** ${goalSummary}. (راجع التعليمات التفصيلية لهذه المهمة إذا لزم الأمر).\n`;
@@ -242,7 +227,7 @@ const constructPromptParts = (params: ProcessTextsParams): Part[] => {
   }
   parts.push({ text: userRequirementsSection });
 
-  const jsonReminderTasks = TASKS_EXPECTING_JSON_RESPONSE.map(t => TASK_DESCRIPTIONS_FOR_PROMPT[t]?.split(':')[0] || t).join(', ');
+  const jsonReminderTasks = TASKS_EXPECTING_JSON_RESPONSE.map(t => (TASK_DESCRIPTIONS_FOR_PROMPT as any)[t]?.split(':') || t).join(', ');
   parts.push({ text: `\n\n**تذكير بتعليمات الإخراج الصارمة**: اللغة العربية الفصحى. إذا كانت المهمة تتطلب إخراج JSON (مثل مهام: ${jsonReminderTasks}), يجب أن يكون ردك الأساسي هو كائن JSON صالح يتبع الواجهة المحددة للمهمة، وقد يكون محاطًا بـ \`\`\`json ... \`\`\`.` });
 
   return parts;
@@ -257,39 +242,50 @@ const MAX_RETRIES = 1;
  * @param {number} [retries=0] - The current number of retries for the API call.
  * @returns {Promise<GeminiServiceResponse>} A promise that resolves with the response from the Gemini service.
  */
-export const processTextsWithGemini = async (params: ProcessTextsParams, retries: number = 0): Promise<GeminiServiceResponse> => {
-  try {
-    const genAI = getAiInstance();
-    const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
-    const promptParts = constructPromptParts(params);
+export class GeminiService {
+  private ai: GoogleGenerativeAI;
+  private config: AgentConfig;
 
-    const contents: Content[] = [{ role: "user", parts: promptParts }];
+  constructor(apiKey: string, config: AgentConfig) {
+    if (!apiKey) {
+      throw new Error("لم يتم تعيين مفتاح Gemini API في ملف التكوين.");
+    }
+    this.ai = new GoogleGenerativeAI(apiKey);
+    this.config = config;
+  }
 
-    const shouldExpectJson = TASKS_EXPECTING_JSON_RESPONSE.includes(params.taskType);
+  public async processTextsWithGemini(params: ProcessTextsParams, retries: number = 0): Promise<GeminiServiceResponse> {
+    try {
+      const model = this.ai.getGenerativeModel({ model: this.config.model });
+      const promptParts = constructPromptParts(params);
 
-    const safetySettings: SafetySetting[] = [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
-    ];
+      const contents: Content[] = [{ role: "user", parts: promptParts }];
 
-    const result = await model.generateContent({
-      contents,
-      safetySettings,
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 8192,
-      }
-    });
+      const shouldExpectJson = TASKS_EXPECTING_JSON_RESPONSE.includes(params.taskType);
+
+      const safetySettings: SafetySetting[] = [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE }
+      ];
+
+      const result = await model.generateContent({
+        contents,
+        safetySettings,
+        generationConfig: {
+          temperature: this.config.temperature,
+          topK: this.config.topK,
+          topP: this.config.topP,
+          maxOutputTokens: this.config.maxOutputTokens,
+        }
+      });
 
     const response: GenerateContentResponse = result.response;
-    const rawTextOutput = response.text();
+    const rawTextOutput = response.candidates && response.candidates.length > 0 && response.candidates.content.parts.length > 0 ? response.candidates.content.parts.text : '';
 
     if (!rawTextOutput) {
-        if (response.candidates && response.candidates[0] && response.candidates[0].finishReason !== "STOP") {
+        if (response.candidates && response.candidates.length > 0 && response.candidates.finishReason !== "STOP") {
              return { error: ` أنهى Gemini المعالجة بسبب: ${response.candidates[0].finishReason}. قد يكون المحتوى قد تم حظره أو انتهى بشكل غير متوقع.` };
         }
         return { error: "أرجع Gemini استجابة نصية فارغة." };
@@ -298,8 +294,8 @@ export const processTextsWithGemini = async (params: ProcessTextsParams, retries
     let jsonStr = rawTextOutput.trim();
     const fenceRegex = /^(?:\s*```(?:json)?\s*\n?)?([\s\S]*?)(?:\n?\s*```\s*)?$/s;
     const match = jsonStr.match(fenceRegex);
-    if (match && match[1]) {
-      jsonStr = match[1].trim();
+    if (match && match) {
+      jsonStr = match.trim();
     }
 
     if (jsonStr.startsWith('{') || jsonStr.startsWith('[')) {
@@ -333,28 +329,29 @@ export const processTextsWithGemini = async (params: ProcessTextsParams, retries
     if (retries < MAX_RETRIES && (e.status >= 500 || (e.message && e.message.toLowerCase().includes("network error")) ) ) {
       console.log(`إعادة المحاولة (${retries + 1}/${MAX_RETRIES})...`);
       await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retries)));
-      return processTextsWithGemini(params, retries + 1);
+      return this.processTextsWithGemini(params, retries + 1);
     }
 
     let errorMessage = e.message || "حدث خطأ غير معروف مع Gemini API.";
-    if (e.toString && e.toString().toLowerCase().includes("api_key")) {
-        errorMessage = "مفتاح Gemini API مفقود أو غير صالح. يرجى التأكد من تكوين متغير البيئة API_KEY بشكل صحيح.";
-    } else if (e.message && e.message.toLowerCase().includes("request entity size is larger than limit")) {
-      errorMessage = "حجم الملفات المرسلة أو حجم السياق الكلي يتجاوز الحد المسموح به من Gemini API. يرجى محاولة تقليل حجم الملفات أو عددها، أو تقصير نطاق الاستكمال إذا كنت تستخدم الاستكمال التكراري.";
-    } else if (e.message && (e.message.toLowerCase().includes("unsupported mime type") || e.message.toLowerCase().includes("invalid_argument"))) {
-      errorMessage = "واجهت Gemini API مشكلة في معالجة أحد أنواع الملفات المرفوعة أو محتواها. يرجى التحقق من أن الملفات هي من الأنواع المدعومة (نصوص، صور، PDF، DOCX بعد المعالجة) وأنها غير تالفة.";
-    } else if (e.status && (e.status === 400 || e.status === 'INVALID_ARGUMENT')) {
-        errorMessage = `خطأ في الطلب إلى Gemini API (قد يكون بسبب محتوى غير متوقع أو تنسيق خاطئ): ${e.message || 'وسيطات غير صالحة.'}`;
-    } else if (e.status >= 500) {
-        errorMessage = `واجه خادم Gemini API مشكلة (خطأ ${e.status}). يرجى المحاولة مرة أخرى لاحقًا. ${e.message || ''}`;
-    }
+      if (e.toString && e.toString().toLowerCase().includes("api_key")) {
+          errorMessage = "مفتاح Gemini API مفقود أو غير صالح. يرجى التأكد من تكوين متغير البيئة API_KEY بشكل صحيح.";
+      } else if (e.message && e.message.toLowerCase().includes("request entity size is larger than limit")) {
+        errorMessage = "حجم الملفات المرسلة أو حجم السياق الكلي يتجاوز الحد المسموح به من Gemini API. يرجى محاولة تقليل حجم الملفات أو عددها، أو تقصير نطاق الاستكمال إذا كنت تستخدم الاستكمال التكراري.";
+      } else if (e.message && (e.message.toLowerCase().includes("unsupported mime type") || e.message.toLowerCase().includes("invalid_argument"))) {
+        errorMessage = "واجهت Gemini API مشكلة في معالجة أحد أنواع الملفات المرفوعة أو محتواها. يرجى التحقق من أن الملفات هي من الأنواع المدعومة (نصوص، صور، PDF، DOCX بعد المعالجة) وأنها غير تالفة.";
+      } else if (e.status && (e.status === 400 || e.status === 'INVALID_ARGUMENT')) {
+          errorMessage = `خطأ في الطلب إلى Gemini API (قد يكون بسبب محتوى غير متوقع أو تنسيق خاطئ): ${e.message || 'وسيطات غير صالحة.'}`;
+      } else if (e.status >= 500) {
+          errorMessage = `واجه خادم Gemini API مشكلة (خطأ ${e.status}). يرجى المحاولة مرة أخرى لاحقًا. ${e.message || ''}`;
+      }
 
-    if (e.response && e.response.error && e.response.error.message) {
-        errorMessage = `خطأ من Gemini API: ${e.response.error.message}`;
-    } else if (e.message && e.message.includes("content") && e.message.includes("blocked")) {
-        errorMessage = `تم حظر المحتوى بواسطة Gemini API بسبب سياسات الأمان. ${e.message}`;
-    }
+      if (e.response && e.response.error && e.response.error.message) {
+          errorMessage = `خطأ من Gemini API: ${e.response.error.message}`;
+      } else if (e.message && e.message.includes("content") && e.message.includes("blocked")) {
+          errorMessage = `تم حظر المحتوى بواسطة Gemini API بسبب سياسات الأمان. ${e.message}`;
+      }
 
-    return { error: errorMessage };
+      return { error: errorMessage };
+    }
   }
-};
+}

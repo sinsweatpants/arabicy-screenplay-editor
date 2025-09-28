@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const tensionOptimizerAgent: AIAgentConfig = {
     name: "DramaEngine AI",
     description: "وكيل محرك الدراما التحسيني: محسن توتر متطور يستخدم خوارزميات التحسين التطورية مع نماذج علم النفس الدرامي لضبط منحنيات التوتر والإثارة، مزود بتقنيات المحاكاة العاطفية ونماذج استجابة الجمهور التنبؤية، مع قدرات التحكم الديناميكي في شدة وتوقيت الذروات الدرامية.",
     category: TaskCategory.PREDICTIVE,

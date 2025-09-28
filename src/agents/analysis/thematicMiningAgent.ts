@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const thematicMiningAgent: AIAgentConfig = {
     name: "ConceptMiner AI",
     description: "وكيل التنقيب المفاهيمي العميق: محرك ذكي يستخدم تقنيات التعلم غير المراقب مع خوارزميات Topic Modeling المتقدمة (LDA, BERTopic) وتحليل المشاعر الدلالي العميق لاستخراج الموضوعات الكامنة والرسائل الضمنية، مدعوم بشبكات الانتباه الهرمية وتقنيات الفهم القرائي المتقدمة للكشف عن الطبقات المعنوية المتعددة.",
     category: TaskCategory.ANALYSIS,

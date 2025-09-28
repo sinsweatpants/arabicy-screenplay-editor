@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const themesMessagesAnalyzerAgent: AIAgentConfig = {
     name: "PhilosophyMiner AI",
     description: "الوحدة 6 - منقب الفلسفة العميقة: محلل موضوعات ورسائل متطور يستخدم تقنيات الفلسفة الحاسوبية مع نماذج التحليل الهرمنوطيقي الذكي لاستخراج الطبقات المعنوية العميقة والرسائل الفلسفية المضمرة، مزود بخوارزميات كشف التناقضات الموضوعاتية وتحليل التماسك الفلسفي، مع قدرات تقييم الأصالة الفكرية والعمق المفاهيمي.",
     category: TaskCategory.ADVANCED_MODULES,

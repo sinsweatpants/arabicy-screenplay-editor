@@ -1,6 +1,10 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const ANALYSIS_INSTRUCTIONS = `
+**العملية:** طبق "المحطات السبع للتحليل الدرامي". قم بتضمين قياسات كمية، توصيات ذكية، ووصف لتصورات بيانية ممكنة.
+
+\`\`\`json
 {
   "title": "تحليل نقدي لـ [اسم العمل]",
   "content": "ملخص شامل للتحليل يغطي نقاط القوة والضعف الرئيسية، البنية، الشخصيات، والموضوعات...",
@@ -31,5 +35,4 @@ import type { AIAgentConfig } from '../types/types';
   ]
 }
 \`\`\`
-**العملية:** طبق "المحطات السبع للتحليل الدرامي". قم بتضمين قياسات كمية، توصيات ذكية، ووصف لتصورات بيانية ممكنة.
 `;

@@ -4,33 +4,33 @@
  */
 
 // Export all agent configurations
-import { ANALYSIS_AGENT_CONFIG } from '../agents/analysis/analysisAgent.ts';
-import { CREATIVE_AGENT_CONFIG } from '../agents/creativeAgent.ts';
-import { INTEGRATED_AGENT_CONFIG } from '../agents/integratedAgent.ts';
-import { COMPLETION_AGENT_CONFIG } from '../agents/completionAgent.ts';
-import { RHYTHM_MAPPING_AGENT_CONFIG } from '../agents/analysis/rhythmMappingAgent.ts';
-import { CHARACTER_NETWORK_AGENT_CONFIG } from '../agents/analysis/characterNetworkAgent.ts';
-import { DIALOGUE_FORENSICS_AGENT_CONFIG } from '../agents/analysis/dialogueForensicsAgent.ts';
-import { THEMATIC_MINING_AGENT_CONFIG } from '../agents/thematicMiningAgent.ts';
-import { STYLE_FINGERPRINT_AGENT_CONFIG } from '../agents/styleFingerprintAgent.ts';
-import { CONFLICT_DYNAMICS_AGENT_CONFIG } from '../agents/analysis/conflictDynamicsAgent.ts';
-import { SCENE_GENERATOR_AGENT_CONFIG } from '../agents/sceneGeneratorAgent.ts';
-import { CHARACTER_VOICE_AGENT_CONFIG } from '../agents/analysis/characterVoiceAgent.ts';
-import { WORLD_BUILDER_AGENT_CONFIG } from '../agents/worldBuilderAgent.ts';
-import { PLOT_PREDICTOR_AGENT_CONFIG } from '../agents/analysis/plotPredictorAgent.ts';
-import { TENSION_OPTIMIZER_AGENT_CONFIG } from '../agents/tensionOptimizerAgent.ts';
-import { AUDIENCE_RESONANCE_AGENT_CONFIG } from '../agents/audienceResonanceAgent.ts';
-import { PLATFORM_ADAPTER_AGENT_CONFIG } from '../agents/platformAdapterAgent.ts';
-import { CHARACTER_DEEP_ANALYZER_AGENT_CONFIG } from '../agents/analysis/characterDeepAnalyzerAgent.ts';
-import { DIALOGUE_ADVANCED_ANALYZER_AGENT_CONFIG } from '../agents/analysis/dialogueAdvancedAnalyzerAgent.ts';
-import { VISUAL_CINEMATIC_ANALYZER_AGENT_CONFIG } from '../agents/visualCinematicAnalyzerAgent.ts';
-import { THEMES_MESSAGES_ANALYZER_AGENT_CONFIG } from '../agents/themesMessagesAnalyzerAgent.ts';
-import { CULTURAL_HISTORICAL_ANALYZER_AGENT_CONFIG } from '../agents/analysis/culturalHistoricalAnalyzerAgent.ts';
-import { PRODUCIBILITY_ANALYZER_AGENT_CONFIG } from '../agents/analysis/producibilityAnalyzerAgent.ts';
-import { TARGET_AUDIENCE_ANALYZER_AGENT_CONFIG } from '../agents/analysis/targetAudienceAnalyzerAgent.ts';
-import { LITERARY_QUALITY_ANALYZER_AGENT_CONFIG } from '../agents/analysis/literaryQualityAnalyzerAgent.ts';
-import { RECOMMENDATIONS_GENERATOR_AGENT_CONFIG } from '../agents/recommendationsGeneratorAgent.ts';
-import { ADAPTIVE_REWRITING_AGENT_CONFIG } from '../agents/adaptiveRewritingAgent.ts';
+import { ANALYSIS_AGENT_CONFIG } from '../agents/analysis/config';
+import { creativeAgent as CREATIVE_AGENT_CONFIG } from '../agents/generation/creativeAgent';
+import { INTEGRATED_AGENT_CONFIG } from '../agents/core/integratedAgent';
+import { completionAgent as COMPLETION_AGENT_CONFIG } from '../agents/generation/completionAgent';
+import { RHYTHM_MAPPING_AGENT_CONFIG } from '../agents/analysis/rhythmMappingAgent';
+import { CHARACTER_NETWORK_AGENT_CONFIG } from '../agents/analysis/characterNetworkAgent';
+import { DIALOGUE_FORENSICS_AGENT_CONFIG } from '../agents/analysis/dialogueForensicsAgent';
+import { thematicMiningAgent as THEMATIC_MINING_AGENT_CONFIG } from '../agents/analysis/thematicMiningAgent';
+import { styleFingerprintAgent as STYLE_FINGERPRINT_AGENT_CONFIG } from '../agents/transformation/styleFingerprintAgent';
+import { CONFLICT_DYNAMICS_AGENT_CONFIG } from '../agents/analysis/conflictDynamicsAgent';
+import { sceneGeneratorAgent as SCENE_GENERATOR_AGENT_CONFIG } from '../agents/generation/sceneGeneratorAgent';
+import { CHARACTER_VOICE_AGENT_CONFIG } from '../agents/analysis/characterVoiceAgent';
+import { worldBuilderAgent as WORLD_BUILDER_AGENT_CONFIG } from '../agents/generation/worldBuilderAgent';
+import { PLOT_PREDICTOR_AGENT_CONFIG } from '../agents/analysis/plotPredictorAgent';
+import { tensionOptimizerAgent as TENSION_OPTIMIZER_AGENT_CONFIG } from '../agents/evaluation/tensionOptimizerAgent';
+import { AUDIENCE_RESONANCE_AGENT_CONFIG } from '../agents/evaluation/audienceResonanceAgent';
+import { platformAdapterAgent as PLATFORM_ADAPTER_AGENT_CONFIG } from '../agents/transformation/platformAdapterAgent';
+import { CHARACTER_DEEP_ANALYZER_AGENT_CONFIG } from '../agents/analysis/characterDeepAnalyzerConfig';
+import { DIALOGUE_ADVANCED_ANALYZER_AGENT_CONFIG } from '../agents/analysis/dialogueAdvancedAnalyzerAgent';
+import { visualCinematicAnalyzerAgent as VISUAL_CINEMATIC_ANALYZER_AGENT_CONFIG } from '../agents/analysis/visualCinematicAnalyzerAgent';
+import { themesMessagesAnalyzerAgent as THEMES_MESSAGES_ANALYZER_AGENT_CONFIG } from '../agents/analysis/themesMessagesAnalyzerAgent';
+import { CULTURAL_HISTORICAL_ANALYZER_AGENT_CONFIG } from '../agents/analysis/culturalHistoricalAnalyzerAgent';
+import { PRODUCIBILITY_ANALYZER_AGENT_CONFIG } from '../agents/analysis/producibilityAnalyzerAgent';
+import { TARGET_AUDIENCE_ANALYZER_AGENT_CONFIG } from '../agents/analysis/targetAudienceAnalyzerAgent';
+import { LITERARY_QUALITY_ANALYZER_AGENT_CONFIG } from '../agents/analysis/literaryQualityAnalyzerAgent';
+import { recommendationsGeneratorAgent as RECOMMENDATIONS_GENERATOR_AGENT_CONFIG } from '../agents/generation/recommendationsGeneratorAgent';
+import { ADAPTIVE_REWRITING_AGENT_CONFIG } from '../agents/transformation/adaptiveRewritingAgent';
 
 /**
  * @const {ReadonlyArray<AgentConfig>} AGENT_CONFIGS

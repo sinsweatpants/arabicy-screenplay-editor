@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const sceneGeneratorAgent: AIAgentConfig = {
     name: "SceneArchitect AI",
     description: "وكيل معمار المشاهد الذكي: مولد مشاهد متطور يستخدم تقنيات التخطيط الهرمي مع نماذج اللغة التوليدية المتخصصة لإنشاء مشاهد درامية متكاملة، مزود بخوارزميات الاتساق السردي وتقنيات التحكم في الإيقاع والتوتر، مع قدرات التكامل مع الوصف البصري والحوار الطبيعي.",
     category: TaskCategory.CREATIVE,

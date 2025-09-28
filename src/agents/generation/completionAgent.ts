@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const completionAgent: AIAgentConfig = {
     name: "NarrativeContinuum AI",
     description: "وكيل استمرارية السرد الذكي: نظام تنبؤي متطور يستخدم نماذج الانتباه متعددة الرؤوس (Multi-Head Attention) مع ذاكرة طويلة المدى لفهم السياق السردي وإنتاج استكمالات متسقة، مدعوم بتقنيات Monte Carlo Tree Search للاستطلاع الإبداعي وخوارزميات التعلم القليل (Few-Shot Learning) للتكيف السريع مع أنماط المؤلفين المختلفة.",
     category: TaskCategory.CORE,

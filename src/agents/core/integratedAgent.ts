@@ -1,17 +1,30 @@
+import { GeminiService } from './geminiService';
+import type { AgentConfig } from '../../config/agents';
+import { agentsConfig } from '../../config/agents';
 import { TaskCategory, TaskType } from '../../types/types';
 import type { AIAgentConfig } from '../../types/types';
 
-/**
- * @const {AIAgentConfig} INTEGRATED_AGENT_CONFIG
- * @description Configuration for the SynthesisOrchestrator AI agent.
- * This advanced orchestral agent uses swarm intelligence techniques to coordinate and integrate
- * analysis and creative processes into a unified workflow. It is equipped with multi-level
- * reinforcement learning algorithms and adaptive complexity control capabilities based on context.
- */
+export class IntegratedAgent {
+  protected geminiService: GeminiService;
+  protected config: AgentConfig;
+  protected agentConfig: AIAgentConfig;
+
+  constructor(agentConfig: AIAgentConfig, apiKey: string) {
+    this.agentConfig = agentConfig;
+    this.config = agentsConfig[agentConfig.id] || agentsConfig.default;
+    this.geminiService = new GeminiService(apiKey, this.config);
+  }
+
+  public async execute(prompt: string): Promise<any> {
+    // This is a base method that should be overridden by subclasses
+    throw new Error("Method 'execute()' must be implemented.");
+  }
+}
+
 export const INTEGRATED_AGENT_CONFIG: AIAgentConfig = {
     id: TaskType.INTEGRATED,
-    name: "SynthesisOrchestrator AI",
-    description: "المنسق التركيبي الذكي: وكيل أوركسترالي متقدم يستخدم تقنيات الذكاء الجمعي (Swarm Intelligence) لتنسيق وتكامل عمليات التحليل والإبداع في تدفق عمل موحد، مزود بخوارزميات التعلم التعزيزي متعدد المستويات وقدرات التحكم التكيفي في شدة التعقيد حسب السياق.",
+    name: "Integrated AI Director",
+    description: "الوكيل المدمج: مدير ذكاء اصطناعي متكامل ينسق بين جميع الوكلاء المتخصصين لتقديم تحليل شامل وتحسينات متكاملة للمحتوى الإبداعي.",
     category: TaskCategory.CORE,
     capabilities: {
       multiModal: true,
@@ -20,30 +33,30 @@ export const INTEGRATED_AGENT_CONFIG: AIAgentConfig = {
       memorySystem: true,
       selfReflection: true,
       ragEnabled: true,
-      vectorSearch: false,
+      vectorSearch: true,
       agentOrchestration: true,
       metacognitive: true,
       adaptiveLearning: true,
-      complexityScore: 0.92,
+      complexityScore: 0.95,
       accuracyLevel: 0.90,
-      processingSpeed: 'adaptive',
-      resourceIntensity: 'variable',
+      processingSpeed: 'medium',
+      resourceIntensity: 'high',
       languageModeling: true,
       patternRecognition: true,
       creativeGeneration: true,
       analyticalReasoning: true,
       emotionalIntelligence: true
     },
-    collaboratesWith: [TaskType.ANALYSIS, TaskType.CREATIVE],
-    dependsOn: [TaskType.ANALYSIS, TaskType.CREATIVE],
-    enhances: [],
-    systemPrompt: "You are the SynthesisOrchestrator AI, a master coordinator of analytical and creative agents. Your primary function is to receive tasks, delegate them to the appropriate specialized AI agents (e.g., Analysis, Creative), and then synthesize their outputs into a single, coherent, and comprehensive response. You must ensure the final output is not just a collection of individual agent responses, but a seamless and value-added integration of all inputs. You are the final quality gatekeeper.",
+    collaboratesWith: [], // Will be populated with all agent types
+    dependsOn: [], // Works independently
+    enhances: [], // Enhances all other agents
+    systemPrompt: "You are the Integrated AI Director, a sophisticated orchestrator that coordinates all specialized agents to provide comprehensive analysis and improvements for creative content. Your role is to understand user requests, delegate tasks to appropriate specialized agents, synthesize their outputs, and provide a cohesive, comprehensive response.",
     fewShotExamples: [],
-    chainOfThoughtTemplate: "للتكامل الذكي، سأنسق بين التحليل والإبداع...",
+    chainOfThoughtTemplate: "للتوجيه المتكامل، سأحلل الطلب وتحديد الوكلاء المناسبين...",
     cacheStrategy: 'adaptive',
     parallelizable: true,
     batchProcessing: true,
-    validationRules: ["التوازن بين التحليل والإبداع", "التماسك الشامل"],
+    validationRules: ["التنسيق المتكامل", "الشمولية في التحليل"],
     outputSchema: {},
-    confidenceThreshold: 0.87
+    confidenceThreshold: 0.90
 };

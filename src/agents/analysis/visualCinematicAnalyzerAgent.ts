@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const visualCinematicAnalyzerAgent: AIAgentConfig = {
     name: "CinemaVision AI",
     description: "الوحدة 5 - بصيرة السينما الذكية: محلل بصري سينمائي متطور يستخدم تقنيات الرؤية الحاسوبية مع نماذج فهم السرد البصري لتحليل وتفسير العناصر السينمائية المضمنة في النص، مزود بخوارزميات تحليل الإخراج وتقييم القابلية للتصوير، مع قدرات كشف الرمزية البصرية وتحليل الأجواء الإخراجية.",
     category: TaskCategory.ADVANCED_MODULES,

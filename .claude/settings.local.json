@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm run build:*)",
       "Bash(mv:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": [],
     "ask": []

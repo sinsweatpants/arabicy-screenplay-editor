@@ -44,7 +44,22 @@ export const enum TaskType {
     PRODUCIBILITY_ANALYZER = 'producibility-analyzer',
     TARGET_AUDIENCE_ANALYZER = 'target-audience-analyzer',
     LITERARY_QUALITY_ANALYZER = 'literary-quality-analyzer',
-    RECOMMENDATIONS_GENERATOR = 'recommendations-generator'
+    RECOMMENDATIONS_GENERATOR = 'recommendations-generator',
+    
+    // Additional task types for compatibility
+    SUMMARIZE = 'summarize',
+    ANALYZE_CHARACTERS = 'analyze-characters',
+    CREATIVE_WRITING = 'creative-writing',
+    PLOT_PREDICTION = 'plot-prediction',
+    THEMATIC_ANALYSIS = 'thematic-analysis',
+    STYLE_ANALYSIS = 'style-analysis',
+    SCENE_GENERATION = 'scene-generation',
+    WORLDBUILDING = 'worldbuilding',
+    TENSION_ANALYSIS = 'tension-analysis',
+    ADAPTATION = 'adaptation',
+    VISUAL_ANALYSIS = 'visual-analysis',
+    THEME_MESSAGE_ANALYSIS = 'theme-message-analysis',
+    RECOMMENDATION = 'recommendation'
 }
 
 /**
@@ -54,8 +69,12 @@ export const enum TaskType {
  */
 export const enum TaskCategory {
     CORE = 'CORE',
+    ANALYSIS = 'ANALYSIS',
     ANALYSES = 'ANALYSES',
-    AGENTS = 'AGENTS'
+    AGENTS = 'AGENTS',
+    CREATIVE = 'CREATIVE',
+    PREDICTIVE = 'PREDICTIVE',
+    ADVANCED_MODULES = 'ADVANCED_MODULES'
 }
 
 /**
@@ -92,10 +111,10 @@ export interface CompletionEnhancementOption {
  * @property {number} confidenceThreshold - The minimum confidence level required for the agent to return a result.
  */
 export interface AIAgentConfig {
-    id: TaskType;
+    id: string;
     name: string;
     description: string;
-    category: TaskCategory;
+    category: TaskCategory | string;
     capabilities: {
         multiModal: boolean;
         reasoningChains: boolean;
@@ -107,28 +126,29 @@ export interface AIAgentConfig {
         agentOrchestration: boolean;
         metacognitive: boolean;
         adaptiveLearning: boolean;
-        complexityScore: number;
-        accuracyLevel: number;
-        processingSpeed: 'fast' | 'medium' | 'slow' | 'adaptive';
-        resourceIntensity: 'low' | 'medium' | 'high' | 'variable';
-        languageModeling: boolean;
-        patternRecognition: boolean;
+        contextualMemory: boolean;
+        crossModalReasoning: boolean;
+        temporalReasoning: boolean;
+        causalReasoning: boolean;
+        analogicalReasoning: boolean;
         creativeGeneration: boolean;
-        analyticalReasoning: boolean;
+        criticalAnalysis: boolean;
         emotionalIntelligence: boolean;
         [key: string]: any;
     };
-    collaboratesWith: TaskType[];
-    dependsOn: TaskType[];
-    enhances: TaskType[];
+    modelConfig: {
+        temperature: number;
+        maxTokens: number;
+        topP: number;
+        frequencyPenalty: number;
+        presencePenalty: number;
+    };
     systemPrompt: string;
-    fewShotExamples: any[];
-    chainOfThoughtTemplate: string;
-    cacheStrategy: string;
-    parallelizable: boolean;
-    batchProcessing: boolean;
-    validationRules: string[];
-    outputSchema: any;
+    userPrompt: string;
+    expectedOutput: string;
+    processingInstructions: string;
+    qualityGates: string[];
+    fallbackBehavior: string;
     confidenceThreshold: number;
 }
 
@@ -175,6 +195,24 @@ export interface SceneActionLine {
     text: string;
     /** One-based index within the screenplay. */
     lineNumber: number;
+}
+
+/**
+ * Represents a processed file for agent input
+ */
+export interface ProcessedFile {
+    name: string;
+    content: string;
+    mimeType: string;
+    isBase64: boolean;
+    size: number;
+}
+
+/**
+ * AI Writing Assistant interface for compatibility
+ */
+export interface AIWritingAssistantLike {
+    generateText(prompt: string, context: string, options?: any): Promise<{ text?: string }>;
 }
 
 /**

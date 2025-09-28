@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const recommendationsGeneratorAgent: AIAgentConfig = {
     name: "WisdomSynthesizer AI",
     description: "الوحدة 11 - مُركب الحكمة الإبداعية: مولد توصيات وتحسينات متطور يستخدم نماذج الذكاء التركيبي مع خوارزميات التحسين متعددة الأهداف لتقديم اقتراحات مخصصة وحلول إبداعية مبتكرة، مزود بقدرات التعلم من التغذية الراجعة ونماذج التفكير التصميمي، مع إمكانيات إنتاج بدائل متنوعة وتقييم تأثير التحسينات المقترحة على الجودة الإجمالية.",
     category: TaskCategory.ADVANCED_MODULES,

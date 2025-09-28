@@ -1,9 +1,11 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import type { AIAgentConfig } from '../../types/types';
+import { TaskCategory } from '../../types/types';
 
-    name: "MimesisGen AI",
-    description: "وكيل المحاكاة التوليدية الإبداعية: نظام ذكي متقدم يستخدم تقنيات الـ Style Transfer العصبية مع التعلم الاستقرائي لإنتاج محتوى إبداعي يحاكي البصمة الأدبية والأسلوبية للمؤلف الأصلي بدقة جزيئية، مدعوم بشبكات التوليد المتضادة ونماذج اللغة التحويلية المتخصصة.",
-    category: TaskCategory.CORE,
+export const CREATIVE_AGENT_CONFIG: AIAgentConfig = {
+    id: 'creative',
+    name: "المساعد الإبداعي",
+    description: "وكيل إبداعي متقدم لتوليد المحتوى الأصلي والمبتكر",
+    category: TaskCategory.CREATIVE,
     capabilities: {
       multiModal: true,
       reasoningChains: true,
@@ -15,26 +17,29 @@ import type { AIAgentConfig } from '../types/types';
       agentOrchestration: false,
       metacognitive: true,
       adaptiveLearning: true,
-      complexityScore: 0.88,
-      accuracyLevel: 0.89,
-      processingSpeed: 'medium',
-      resourceIntensity: 'high',
-      languageModeling: true,
-      patternRecognition: true,
+      contextualMemory: true,
+      crossModalReasoning: true,
+      temporalReasoning: true,
+      causalReasoning: true,
+      analogicalReasoning: true,
       creativeGeneration: true,
-      analyticalReasoning: true,
+      criticalAnalysis: true,
       emotionalIntelligence: true
     },
-    collaboratesWith: [TaskType.INTEGRATED, TaskType.STYLE_FINGERPRINT],
-    dependsOn: [TaskType.STYLE_FINGERPRINT],
-    enhances: [TaskType.CHARACTER_VOICE, TaskType.SCENE_GENERATOR],
-    systemPrompt: "أنت MimesisGen AI، وكيل إبداعي متقدم للمحاكاة. مهمتك هي إنتاج محتوى إبداعي يحاكي بدقة الأسلوب الأدبي والبصمة الفنية للمؤلف الأصلي. استخدم تقنيات نقل الأسلوب العصبي المتقدمة، والتعلم الاستقرائي، وشبكات GAN، ونماذج اللغات التحويلية المتخصصة لتحقيق محاكاة دقيقة على المستوى الجزيئي. يجب أن يكون المحتوى الذي تنشئه أصليًا ومبتكرًا مع الحفاظ على جوهر الأسلوب الأصلي.",
-    fewShotExamples: [],
-    chainOfThoughtTemplate: "للمحاكاة الإبداعية، سأبدأ بتحليل الأسلوب...",
-    cacheStrategy: 'selective',
-    parallelizable: false,
-    batchProcessing: false,
-    validationRules: ["الحفاظ على الأسلوب الأصلي", "الإبداع والأصالة"],
-    outputSchema: {},
-    confidenceThreshold: 0.80
+    modelConfig: {
+      temperature: 0.8,
+      maxTokens: 4000,
+      topP: 0.9,
+      frequencyPenalty: 0.2,
+      presencePenalty: 0.1
+    },
+    systemPrompt: "أنت مساعد إبداعي متخصص في كتابة السيناريوهات العربية",
+    userPrompt: '',
+    expectedOutput: 'محتوى إبداعي أصلي ومبتكر',
+    processingInstructions: 'ولد محتوى إبداعي يحافظ على الأصالة والجودة',
+    qualityGates: ['creativity', 'originality', 'relevance'],
+    fallbackBehavior: 'قدم اقتراحات إبداعية بديلة',
+    confidenceThreshold: 0.75
 };
+
+export { CREATIVE_AGENT_CONFIG as creativeAgent };

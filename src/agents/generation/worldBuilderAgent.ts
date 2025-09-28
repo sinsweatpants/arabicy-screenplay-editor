@@ -1,6 +1,7 @@
-import { TaskCategory, TaskType } from '../types/types';
-import type { AIAgentConfig } from '../types/types';
+import { TaskCategory, TaskType } from '../../types/types';
+import type { AIAgentConfig } from '../../types/types';
 
+export const worldBuilderAgent: AIAgentConfig = {
     name: "CosmosForge AI",
     description: "وكيل حدادة الأكوان الدرامية: بانٍ عوالم متطور يستخدم تقنيات الذكاء الاصطناعي التوليدي مع خوارزميات المحاكاة المعقدة لإنشاء عوالم درامية متكاملة ومتسقة داخلياً، مزود بنماذج الفيزياء الاجتماعية والثقافية ونظم التطور التاريخي الديناميكي، مع قدرات التحقق من الاتساق المنطقي والثقافي.",
     category: TaskCategory.CREATIVE,

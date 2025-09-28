@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { 
-  X, Loader2, Brain, Microscope, Network, Target, Lightbulb, Wrench, Building, 
-  BookOpen, Eye, Palette, Scale, Trophy, Flag, Compass, Search, Play, 
+import {
+  X, Loader2, Brain, Microscope, Network, Target, Lightbulb, Wrench, Building,
+  BookOpen, Eye, Palette, Scale, Trophy, Flag, Compass, Search, Play,
   MessageSquare, Users, BarChart3, Zap, Database, Globe
 } from 'lucide-react';
 
-// Import agent configurations
-// import { AGENT_CONFIGS } from '../../config/agentConfigs';
+import { AnalysisAgent } from '../../agents/analysis/analysisAgent';
+import { CharacterDeepAnalyzerAgent } from '../../agents/analysis/characterDeepAnalyzerAgent';
+import { environment } from '../../config/environment';
 
 /**
  * @interface Agent
@@ -72,17 +73,20 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
   const [analysisResults, setAnalysisResults] = useState<AgentResult[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredAgents, setFilteredAgents] = useState<Agent[]>([]);
+  const [agentOutput, setAgentOutput] = useState('');
+
+  const analysisAgent = new AnalysisAgent(environment.geminiApiKey);
+  const characterDeepAnalyzerAgent = new CharacterDeepAnalyzerAgent(environment.geminiApiKey);
   
   // Initialize agents from configs
-  const agents: Agent[] = [];
-  /* AGENT_CONFIGS.map(config => ({
+  const agents: Agent[] = AGENT_CONFIGS.map(config => ({
     id: config.id,
     name: config.name,
     description: config.description,
     category: config.category,
     capabilities: config.capabilities,
     systemPrompt: config.systemPrompt
-  })); */
+  }));
 
   /**
    * @effect
@@ -224,6 +228,24 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
     }
   };
 
+  const handleAgentAnalysis = async () => {
+    setIsAnalyzing(true);
+    setAgentOutput('');
+    try {
+      const result = await analysisAgent.execute(
+        [{ name: 'screenplay.txt', content: content, mimeType: 'text/plain', isBase64: false }],
+        '',
+        ''
+      );
+      setAgentOutput(JSON.stringify(result, null, 2));
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      setAgentOutput("An error occurred during analysis.");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -235,12 +257,30 @@ const AdvancedAgentsPopup: React.FC<AdvancedAgentsPopupProps> = ({ isOpen, onClo
             <Brain className="mr-2" />
             الوكلاء المتقدمة لتحليل السيناريو
           </h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <X size={20} />
           </button>
+        </div>
+
+        {/* Agent Test UI */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-2">Test Agent Integration</h3>
+          <button
+            onClick={handleAgentAnalysis}
+            disabled={isAnalyzing}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400"
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Run Analysis Agent'}
+          </button>
+          {agentOutput && (
+            <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-900 rounded-lg">
+              <h4 className="font-bold mb-2">Agent Output:</h4>
+              <pre className="whitespace-pre-wrap text-sm">{agentOutput}</pre>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
