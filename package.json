@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && node --experimental-specifier-resolution=node --test dist-test/tests"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

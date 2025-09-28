@@ -1,5 +1,11 @@
-import ScreenplayEditor from './ScreenplayEditor';
+import type { JSX } from 'react';
+import NaqidDashboard from './components/naqid/NaqidDashboard';
 
-export default function App() {
-  return <ScreenplayEditor />;
+/**
+ * Renders the root application shell that hosts the screenplay editor experience.
+ *
+ * @returns {JSX.Element} The fully configured screenplay editor component.
+ */
+export default function App(): JSX.Element {
+  return <NaqidDashboard />;
 }
